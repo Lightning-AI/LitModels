@@ -4,7 +4,7 @@ import tempfile
 import warnings
 from abc import ABC
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from lightning_utilities.core.rank_zero import rank_zero_warn
 
@@ -43,7 +43,7 @@ class ModelRegistryMixin(ABC):
 
     def _setup(
         self, name: Optional[str] = None, temp_folder: Union[str, Path, None] = None
-    ) -> Tuple[str, str, Union[str, Path]]:
+    ) -> tuple[str, str, Union[str, Path]]:
         """Parse and validate the model name and temporary folder."""
         if name is None:
             name = model_name = self.__class__.__name__
@@ -56,7 +56,7 @@ class ModelRegistryMixin(ABC):
         return name, model_name, temp_folder
 
     def _upload_model_files(
-        self, name: str, path: Union[str, Path, List[Union[str, Path]]], metadata: Optional[dict] = None
+        self, name: str, path: Union[str, Path, list[Union[str, Path]]], metadata: Optional[dict] = None
     ) -> None:
         """Upload the model files to the registry."""
         if not metadata:
