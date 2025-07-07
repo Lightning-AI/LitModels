@@ -3,7 +3,7 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from lightning_sdk.lightning_cloud.env import LIGHTNING_CLOUD_URL
 from lightning_sdk.models import _extend_model_name_with_teamspace, _parse_org_teamspace_model_version
@@ -45,11 +45,11 @@ def _print_model_link(name: str, verbose: Union[bool, int]) -> None:
 
 def upload_model_files(
     name: str,
-    path: Union[str, Path, List[Union[str, Path]]],
+    path: Union[str, Path, list[Union[str, Path]]],
     progress_bar: bool = True,
     cloud_account: Optional[str] = None,
     verbose: Union[bool, int] = 1,
-    metadata: Optional[Dict[str, str]] = None,
+    metadata: Optional[dict[str, str]] = None,
 ) -> "UploadedModelInfo":
     """Upload a local checkpoint file to the model store.
 
@@ -83,7 +83,7 @@ def download_model_files(
     name: str,
     download_dir: Union[str, Path] = ".",
     progress_bar: bool = True,
-) -> Union[str, List[str]]:
+) -> Union[str, list[str]]:
     """Download a checkpoint from the model store.
 
     Args:
@@ -103,7 +103,7 @@ def download_model_files(
     )
 
 
-def _list_available_teamspaces() -> Dict[str, dict]:
+def _list_available_teamspaces() -> dict[str, dict]:
     """List available teamspaces for the authenticated user.
 
     Returns:

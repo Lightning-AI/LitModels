@@ -1,7 +1,7 @@
 import os
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from litmodels.io.cloud import download_model_files, upload_model_files
 from litmodels.io.utils import _KERAS_AVAILABLE, _PYTORCH_AVAILABLE, dump_pickle, load_pickle
@@ -22,7 +22,7 @@ def upload_model(
     progress_bar: bool = True,
     cloud_account: Optional[str] = None,
     verbose: Union[bool, int] = 1,
-    metadata: Optional[Dict[str, str]] = None,
+    metadata: Optional[dict[str, str]] = None,
 ) -> "UploadedModelInfo":
     """Upload a checkpoint to the model store.
 
@@ -60,7 +60,7 @@ def save_model(
     cloud_account: Optional[str] = None,
     staging_dir: Optional[str] = None,
     verbose: Union[bool, int] = 1,
-    metadata: Optional[Dict[str, str]] = None,
+    metadata: Optional[dict[str, str]] = None,
 ) -> "UploadedModelInfo":
     """Upload a checkpoint to the model store.
 
@@ -119,7 +119,7 @@ def download_model(
     name: str,
     download_dir: Union[str, Path] = ".",
     progress_bar: bool = True,
-) -> Union[str, List[str]]:
+) -> Union[str, list[str]]:
     """Download a checkpoint from the model store.
 
     Args:
