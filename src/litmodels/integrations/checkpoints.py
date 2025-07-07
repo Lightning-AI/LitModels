@@ -4,7 +4,7 @@ import queue
 import threading
 from abc import ABC
 from datetime import datetime
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
 
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 # Create a singleton upload manager
-@lru_cache(maxsize=None)
+@cache
 def get_model_manager() -> "ModelManager":
     """Get or create the singleton upload manager."""
     return ModelManager()
