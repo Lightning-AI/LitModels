@@ -1,2 +1,2 @@
-lightning-sdk >=0.2.11
+lightning-sdk >=0.2.24rc
 lightning-utilities
