@@ -5,6 +5,8 @@ on: # Trigger the workflow on push or pull request, but only for the main branch
   push: {}
   pull_request:
     branches: [main]
+  schedule:
+    - cron: "0 0 * * *"  # every day at midnight UTC
 
 defaults:
   run:
@@ -21,10 +23,10 @@ jobs:
         requires: ["latest"]
         dependency: ["lightning"]
         include:
-          - { requires: "oldest", dependency: "lightning", os: "ubuntu-22.04", python-version: "3.9" }
-          - { requires: "latest", dependency: "pytorch_lightning", os: "ubuntu-24.04", python-version: "3.12" }
-          - { requires: "latest", dependency: "pytorch_lightning", os: "windows-2022", python-version: "3.12" }
-          - { requires: "latest", dependency: "pytorch_lightning", os: "macOS-13", python-version: "3.12" }
+          - { os: "ubuntu-22.04", python-version: "3.9", requires: "oldest", dependency: "lightning" }
+          - { os: "ubuntu-24.04", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
+          - { os: "windows-2022", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
+          - { os: "macOS-13", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
 
     # Timeout: https://stackoverflow.com/a/59076067/4521646
     timeout-minutes: 35

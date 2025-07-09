@@ -5,7 +5,7 @@ on:
   push:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * *"  # every day at midnight UTC
 
 defaults:
   run:
@@ -39,6 +39,9 @@ jobs:
       matrix:
         os: ["ubuntu-22.04", "macOS-13", "windows-2022"]
         python-version: ["3.10"]
+        requires: ["latest"]
+        include:
+          - { os: "ubuntu-22.04", python-version: "3.9", requires: "oldest" }
 
     # Timeout: https://stackoverflow.com/a/59076067/4521646
     timeout-minutes: 25
@@ -51,6 +54,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
+
+      - name: Set min. dependencies
+        if: matrix.requires == 'oldest'
+        run: |
+          pip install 'lightning-utilities[cli]'
+          python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt"]'
 
       - name: Install package & dependencies
         run: |
