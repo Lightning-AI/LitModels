@@ -1,11 +1,12 @@
+import os
 import pickle
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Union
-import os
-from contextlib import contextmanager
 
 from lightning_utilities import module_available
 from lightning_utilities.core.imports import RequirementCache
+
 
 @contextmanager
 def suppress_os_stderr():
@@ -18,7 +19,6 @@ def suppress_os_stderr():
     finally:
         os.dup2(old_stderr_fd, 2)  # restore stderr
         os.close(old_stderr_fd)
-
 
 
 _JOBLIB_AVAILABLE = module_available("joblib")
