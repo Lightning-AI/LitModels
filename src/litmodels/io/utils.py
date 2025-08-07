@@ -9,7 +9,7 @@ from lightning_utilities.core.imports import RequirementCache
 
 
 @contextmanager
-def suppress_os_stderr():
+def _suppress_os_stderr():
     devnull_fd = os.open(os.devnull, os.O_WRONLY)
     old_stderr_fd = os.dup(2)
     os.dup2(devnull_fd, 2)  # redirect stderr (fd 2) to /dev/null
@@ -23,7 +23,7 @@ def suppress_os_stderr():
 
 _JOBLIB_AVAILABLE = module_available("joblib")
 _PYTORCH_AVAILABLE = module_available("torch")
-with suppress_os_stderr():
+with _suppress_os_stderr():
     _TENSORFLOW_AVAILABLE = module_available("tensorflow")
     _KERAS_AVAILABLE = RequirementCache("tensorflow >=2.0.0")
 
