@@ -1,14 +1,31 @@
 import pickle
 from pathlib import Path
 from typing import Any, Union
+import os
+from contextlib import contextmanager
 
 from lightning_utilities import module_available
 from lightning_utilities.core.imports import RequirementCache
 
+@contextmanager
+def suppress_os_stderr():
+    devnull_fd = os.open(os.devnull, os.O_WRONLY)
+    old_stderr_fd = os.dup(2)
+    os.dup2(devnull_fd, 2)  # redirect stderr (fd 2) to /dev/null
+    os.close(devnull_fd)
+    try:
+        yield
+    finally:
+        os.dup2(old_stderr_fd, 2)  # restore stderr
+        os.close(old_stderr_fd)
+
+
+
 _JOBLIB_AVAILABLE = module_available("joblib")
 _PYTORCH_AVAILABLE = module_available("torch")
-_TENSORFLOW_AVAILABLE = module_available("tensorflow")
-_KERAS_AVAILABLE = RequirementCache("tensorflow >=2.0.0")
+with suppress_os_stderr():
+    _TENSORFLOW_AVAILABLE = module_available("tensorflow")
+    _KERAS_AVAILABLE = RequirementCache("tensorflow >=2.0.0")
 
 if _JOBLIB_AVAILABLE:
     import joblib
