@@ -1,5 +1,6 @@
 import os
 import pickle
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Union
