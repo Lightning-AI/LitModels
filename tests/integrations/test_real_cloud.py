@@ -208,6 +208,7 @@ def test_lightning_plain_resume(trainer_method, registry, importing, in_studio, 
     ],
 )
 @pytest.mark.cloud
+@pytest.mark.skipif(platform.system() != "Linux", reason="Only Linux is supported for DDP")
 def test_lightning_checkpoint_ddp(importing, tmp_path):
     if importing == "lightning":
         from lightning import Trainer
