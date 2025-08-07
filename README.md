@@ -78,9 +78,7 @@ Load model:
 from litmodels import load_model
 
 # when loading a Pytorch model a instance of the model is also needed
-model_ = load_model(
-    name="your_org/your_team/torch-model", model_instance=model
-)
+model_ = load_model(name="your_org/your_team/torch-model", model_instance=model)
 ```
 
 </details>

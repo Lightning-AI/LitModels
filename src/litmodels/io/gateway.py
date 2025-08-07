@@ -139,11 +139,7 @@ def download_model(
     )
 
 
-def load_model(
-    name: str, 
-    download_dir: str = ".",
-    model_instance: Optional[object] = None
-) -> Any:
+def load_model(name: str, download_dir: str = ".", model_instance: Optional[object] = None) -> Any:
     """Download a model from the model store and load it into memory.
 
     Args:
@@ -168,11 +164,10 @@ def load_model(
     if model_path.suffix.lower() == ".pth":
         if model_instance is not None and isinstance(model_instance, torch.nn.Module):
             return model_instance.load_state_dict(torch.load(model_path))
-        else:
-            raise ValueError(
-                "Trying to load a Pure Pytorch model. Expected the optional `model_instance`"
-                "to be provided with a instance of the saved model to load the model weights into."
-            )
+        raise ValueError(
+            "Trying to load a Pure Pytorch model. Expected the optional `model_instance`"
+            "to be provided with a instance of the saved model to load the model weights into."
+        )
     if model_path.suffix.lower() == ".keras":
         return keras.models.load_model(model_path)
     if model_path.suffix.lower() == ".pkl":

@@ -148,9 +148,7 @@ def test_load_model_torch(mock_download_model, tmp_path):
 
     # The lit-logger function is just a wrapper around the SDK function
     model = load_model(
-        name="org-name/teamspace/model-name",
-        download_dir=str(tmp_path),
-        model_instance=torch.nn.Module()
+        name="org-name/teamspace/model-name", download_dir=str(tmp_path), model_instance=torch.nn.Module()
     )
     mock_download_model.assert_called_once_with(
         name="org-name/teamspace/model-name", download_dir=str(tmp_path), progress_bar=True
