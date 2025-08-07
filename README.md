@@ -77,7 +77,10 @@ Load model:
 ```python
 from litmodels import load_model
 
-model_ = load_model(name="your_org/your_team/torch-model")
+# when loading a Pytorch model a instance of the model is also needed
+model_ = load_model(
+    name="your_org/your_team/torch-model", model_instance=model
+)
 ```
 
 </details>
@@ -100,7 +103,7 @@ trainer.fit(BoringModel())
 # Upload the best model to cloud storage
 checkpoint_path = getattr(trainer.checkpoint_callback, "best_model_path")
 # Define the model name - this should be unique to your model
-upload_model(model=checkpoint_path, name="<organization>/<teamspace>/<model-name>")
+upload_model(model=checkpoint_path, name="<organization>/<teamspace>/lightning-model")
 ```
 
 Load model:
@@ -113,7 +116,7 @@ from litmodels.demos import BoringModel
 # Load the model from cloud storage
 checkpoint_path = download_model(
     # Define the model name and version - this needs to be unique to your model
-    name="<organization>/<teamspace>/<model-name>:<model-version>",
+    name="<organization>/<teamspace>/lightning-model:<model-version>",
     download_dir="my_models",
 )
 print(f"model: {checkpoint_path}")
@@ -147,7 +150,7 @@ model = keras.Sequential(
 model.compile(optimizer="adam", loss="categorical_crossentropy")
 
 # Save the model
-save_model("lightning-ai/jirka/sample-tf-keras-model", model=model)
+save_model("<organization>/<teamspace>/tf-keras-model", model=model)
 ```
 
 Load model:
@@ -156,7 +159,7 @@ Load model:
 from litmodels import load_model
 
 model_ = load_model(
-    "lightning-ai/jirka/sample-tf-keras-model", download_dir="./my-model"
+    "<organization>/<teamspace>/tf-keras-model", download_dir="./my-model"
 )
 ```
 
@@ -185,7 +188,7 @@ model = svm.SVC()
 model.fit(X_train, y_train)
 
 # Upload the saved model using litmodels
-save_model(model=model, name="your_org/your_team/sklearn-svm-model")
+save_model(model=model, name="<organization>/<teamspace>/sklearn-model")
 ```
 
 Use model:
@@ -195,7 +198,7 @@ from litmodels import load_model
 
 # Download and load the model file from cloud storage
 model = load_model(
-    name="your_org/your_team/sklearn-svm-model", download_dir="my_models"
+    name="<organization>/<teamspace>/sklearn-model", download_dir="my_models"
 )
 
 # Example: run inference with the loaded model
