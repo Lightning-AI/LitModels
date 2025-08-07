@@ -9,7 +9,7 @@ from lightning_utilities.core.imports import RequirementCache
 
 
 @contextmanager
-def _suppress_os_stderr() -> None:
+def _suppress_os_stderr() -> Iterator[None]:
     devnull_fd = os.open(os.devnull, os.O_WRONLY)
     old_stderr_fd = os.dup(2)
     os.dup2(devnull_fd, 2)  # redirect stderr (fd 2) to /dev/null
