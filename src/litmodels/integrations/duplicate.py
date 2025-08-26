@@ -31,7 +31,7 @@ def duplicate_hf_model(
         metadata: Optional metadata to attach to the uploaded model. Integration markers are added automatically.
 
     Returns:
-        The fully qualified Lightning Cloud model name.
+        The name of the duplicated model in Lightning Cloud.
     """
     if not snapshot_download:
         raise ModuleNotFoundError(

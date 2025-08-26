@@ -131,6 +131,6 @@ def delete_model_version(
 
     Args:
         name: Base model registry name in the form 'organization/teamspace/modelname'.
-        version: Identifier of the version to delete. If omitted, deletion behavior may apply to multiple versions.
+        version: Identifier of the version to delete. This argument is required.
     """
     sdk_delete_model(name=f"{name}:{version}")
