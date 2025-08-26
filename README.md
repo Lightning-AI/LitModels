@@ -1,6 +1,6 @@
 <div align='center'>
 
-# Save, share and host AI model checkpoints Lightning fast ⚡
+# Save, share and host AI model checkpoints Lightning⚡fast
 
 <img alt="Lightning" src="https://pl-public-data.s3.us-east-1.amazonaws.com/assets_lightning/LitModels.png" width="800px" style="max-width: 100%;">
 
@@ -18,11 +18,12 @@ Save, load, host, and share models without slowing down training.
 ✅ Load models anywhere.                 ✅ Host on Lightning or your own cloud.
 </pre>
 
-[![Discord](https://img.shields.io/discord/1077906959069626439?label=Get%20help%20on%20Discord)](https://discord.gg/WajDThKAur)
 ![CI testing](https://github.com/Lightning-AI/LitModels/actions/workflows/ci-testing.yml/badge.svg?event=push)
 ![Cloud integration](https://github.com/Lightning-AI/LitModels/actions/workflows/ci-cloud.yml/badge.svg?event=push)
 [![codecov](https://codecov.io/gh/Lightning-AI/LitModels/graph/badge.svg?token=MQ0PN2cxKo)](https://codecov.io/gh/Lightning-AI/LitModels)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Lightning-AI/LitModels/blob/main/LICENSE)
+
+[![Discord](https://img.shields.io/discord/1077906959069626439?label=Get%20help%20on%20Discord)](https://discord.gg/WajDThKAur)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/litmodels)
 
 <div style="text-align: center;">
