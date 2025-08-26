@@ -21,15 +21,14 @@ _SHOWED_MODEL_LINKS = []
 
 
 def _print_model_link(name: str, verbose: Union[bool, int]) -> None:
-    """Print a link to the uploaded model.
+    """Print a stable URL to the uploaded model.
 
     Args:
-        name: Name of the model.
-        verbose: Whether to print the link:
-
-            - If set to 0, no link will be printed.
-            - If set to 1, the link will be printed only once.
-            - If set to 2, the link will be printed every time.
+        name: Model registry name. Teamspace defaults may be applied before URL construction.
+        verbose: Controls printing behavior:
+            - 0: do not print
+            - 1: print the link only once for a given model
+            - 2: always print the link
     """
     name = _extend_model_name_with_teamspace(name)
     org_name, teamspace_name, model_name, _ = _parse_org_teamspace_model_version(name)
@@ -51,18 +50,18 @@ def upload_model_files(
     verbose: Union[bool, int] = 1,
     metadata: Optional[dict[str, str]] = None,
 ) -> "UploadedModelInfo":
-    """Upload a local checkpoint file to the model store.
+    """Upload local artifact(s) to Lightning Cloud using the SDK.
 
     Args:
-        name: Name of the model to upload. Must be in the format 'organization/teamspace/modelname'
-            where entity is either your username or the name of an organization you are part of.
-        path: Path to the model file to upload.
-        progress_bar: Whether to show a progress bar for the upload.
-        cloud_account: The name of the cloud account to store the Model in. Only required if it can't be determined
-            automatically.
-        verbose: Whether to print a link to the uploaded model. If set to 0, no link will be printed.
-        metadata: Optional metadata to attach to the model. If not provided, a default metadata will be used.
+        name: Model registry name in the form 'organization/teamspace/modelname[:version]'.
+        path: File path, directory path, or list of paths to upload.
+        progress_bar: Whether to show a progress bar during upload.
+        cloud_account: Optional cloud account to store the model in, when it cannot be auto-resolved.
+        verbose: Verbosity for printing the model link (0 = no output, 1 = print once, 2 = print always).
+        metadata: Optional metadata to attach to the model/version. The package version is added automatically.
 
+    Returns:
+        UploadedModelInfo describing the created or updated model version.
     """
     if not metadata:
         metadata = {}
@@ -84,17 +83,15 @@ def download_model_files(
     download_dir: Union[str, Path] = ".",
     progress_bar: bool = True,
 ) -> Union[str, list[str]]:
-    """Download a checkpoint from the model store.
+    """Download artifact(s) for a model version using the SDK.
 
     Args:
-        name: Name of the model to download. Must be in the format 'organization/teamspace/modelname'
-            where entity is either your username or the name of an organization you are part of.
-        download_dir: A path to directory where the model should be downloaded. Defaults
-            to the current working directory.
-        progress_bar: Whether to show a progress bar for the download.
+        name: Model registry name in the form 'organization/teamspace/modelname[:version]'.
+        download_dir: Directory where downloaded artifact(s) will be stored. Defaults to the current directory.
+        progress_bar: Whether to show a progress bar during download.
 
     Returns:
-        The absolute path to the downloaded model file or folder.
+        str | list[str]: Absolute path(s) to the downloaded artifact(s).
     """
     return sdk_download_model(
         name=name,
@@ -104,10 +101,10 @@ def download_model_files(
 
 
 def _list_available_teamspaces() -> dict[str, dict]:
-    """List available teamspaces for the authenticated user.
+    """List teamspaces available to the authenticated user.
 
     Returns:
-        Dict with teamspace names as keys and their details as values.
+        dict[str, dict]: Mapping of 'org/teamspace' to a metadata dictionary with details.
     """
     from lightning_sdk.api import OrgApi, UserApi
     from lightning_sdk.utils import resolve as sdk_resolvers
@@ -130,11 +127,10 @@ def delete_model_version(
     name: str,
     version: Optional[str] = None,
 ) -> None:
-    """Delete a model version from the model store.
+    """Delete a specific model version from the model store.
 
     Args:
-        name: Name of the model to delete. Must be in the format 'organization/teamspace/modelname'
-            where entity is either your username or the name of an organization you are part of.
-        version: Version of the model to delete. If not provided, all versions will be deleted.
+        name: Base model registry name in the form 'organization/teamspace/modelname'.
+        version: Identifier of the version to delete. If omitted, deletion behavior may apply to multiple versions.
     """
     sdk_delete_model(name=f"{name}:{version}")
