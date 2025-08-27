@@ -326,7 +326,7 @@ if _PYTORCHLIGHTNING_AVAILABLE:
         """Drop-in ModelCheckpoint for PyTorch Lightning that uploads to Lightning Cloud.
 
         Args:
-            model_registry: Target model registry in the form 'organization/teamspace/modelname'.
+            model_registry: Name of the model to upload in format 'organization/teamspace/modelname'.
             keep_all_uploaded: If True, does not remove cloud versions when local pruning occurs.
             clear_all_local: If True, removes local checkpoint files after successful upload.
             args: Additional positional arguments forwarded to the base ModelCheckpoint.
