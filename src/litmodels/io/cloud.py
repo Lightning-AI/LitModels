@@ -125,7 +125,7 @@ def _list_available_teamspaces() -> dict[str, dict]:
 
 def delete_model_version(
     name: str,
-    version: Optional[str] = None,
+    version: str,
 ) -> None:
     """Delete a specific model version from the model store.
 
