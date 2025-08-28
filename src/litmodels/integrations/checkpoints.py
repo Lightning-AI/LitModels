@@ -35,7 +35,11 @@ if TYPE_CHECKING:
 # Create a singleton upload manager
 @cache
 def get_model_manager() -> "ModelManager":
-    """Get or create the singleton upload manager."""
+    """Get or create the singleton background manager for uploads/removals.
+
+    Returns:
+        ModelManager: A process-wide, cached instance managing asynchronous tasks.
+    """
     return ModelManager()
 
 
@@ -55,12 +59,16 @@ class RemoveType(StrEnum):
 
 
 class ModelManager:
-    """Manages uploads and removals with a single queue but separate counters."""
+    """Manage asynchronous uploads and removals via a single worker queue.
+
+    This manager runs a daemon worker thread that processes queued upload and removal tasks.
+    It maintains separate counters for pending uploads and removals and supports graceful shutdown.
+    """
 
     task_queue: queue.Queue
 
     def __init__(self) -> None:
-        """Initialize the ModelManager with a task queue and counters."""
+        """Initialize the manager with a task queue, counters, and a daemon worker thread."""
         self.task_queue = queue.Queue()
         self.upload_count = 0
         self.remove_count = 0
@@ -142,7 +150,11 @@ class ModelManager:
 
 # Base class to be inherited
 class LitModelCheckpointMixin(ABC):
-    """Mixin class for LitModel checkpoint functionality."""
+    """Mixin adding upload/remove behavior for Lightning checkpoint callbacks.
+
+    This mixin queues uploads to Lightning Cloud upon checkpoint save and can optionally
+    remove local checkpoints or skip cloud-side pruning based on configuration.
+    """
 
     _datetime_stamp: str
     model_registry: Optional[str] = None
@@ -151,12 +163,12 @@ class LitModelCheckpointMixin(ABC):
     def __init__(
         self, model_registry: Optional[str], keep_all_uploaded: bool = False, clear_all_local: bool = False
     ) -> None:
-        """Initialize with model name.
+        """Configure model registry and pruning behavior.
 
         Args:
-            model_registry: Name of the model to upload in format 'organization/teamspace/modelname'.
-            keep_all_uploaded: Whether prevent deleting models from cloud if the checkpointing logic asks to do so.
-            clear_all_local: Whether to clear local models after uploading to the cloud.
+            model_registry: Target model registry in the form 'organization/teamspace/modelname'.
+            keep_all_uploaded: If True, never delete uploaded cloud versions even if local pruning occurs.
+            clear_all_local: If True, remove local checkpoint files after they are uploaded to cloud.
         """
         if not model_registry:
             rank_zero_warn(
@@ -201,7 +213,7 @@ class LitModelCheckpointMixin(ABC):
 
     @rank_zero_only
     def _remove_model(self, trainer: "pl.Trainer", filepath: Union[str, Path]) -> None:
-        """Remove the local version of the model if requested."""
+        """Queue removal of local and/or cloud artifacts according to configuration."""
         get_model_manager().queue_remove(
             filepath=filepath,
             # skip the local removal we put it in the queue right after the upload
@@ -211,7 +223,7 @@ class LitModelCheckpointMixin(ABC):
         )
 
     def default_model_name(self, pl_model: "pl.LightningModule") -> str:
-        """Generate a default model name based on the class name and timestamp."""
+        """Generate a default model name using the LightningModule class name and a timestamp."""
         return pl_model.__class__.__name__ + f"_{self._datetime_stamp}"
 
     def _update_model_name(self, pl_model: "pl.LightningModule") -> None:
@@ -252,14 +264,14 @@ class LitModelCheckpointMixin(ABC):
 if _LIGHTNING_AVAILABLE:
 
     class LightningModelCheckpoint(LitModelCheckpointMixin, _LightningModelCheckpoint):
-        """Lightning ModelCheckpoint with LitModel support.
+        """Drop-in ModelCheckpoint that uploads saved checkpoints to Lightning Cloud.
 
         Args:
-            model_registry: Name of the model to upload in format 'organization/teamspace/modelname'.
-            keep_all_uploaded: Whether prevent deleting models from cloud if the checkpointing logic asks to do so.
-            clear_all_local: Whether to clear local models after uploading to the cloud.
-            *args: Additional arguments to pass to the parent class.
-            **kwargs: Additional keyword arguments to pass to the parent class.
+            model_registry: Target model registry in the form 'organization/teamspace/modelname'.
+            keep_all_uploaded: If True, does not remove cloud versions when local pruning occurs.
+            clear_all_local: If True, removes local checkpoint files after successful upload.
+            *args: Additional positional arguments forwarded to the base ModelCheckpoint.
+            **kwargs: Additional keyword arguments forwarded to the base ModelCheckpoint.
         """
 
         def __init__(
@@ -291,7 +303,7 @@ if _LIGHTNING_AVAILABLE:
             self._update_model_name(pl_module)
 
         def _save_checkpoint(self, trainer: "pl.Trainer", filepath: str) -> None:
-            """Extend the save checkpoint method to upload the model."""
+            """Save the checkpoint and queue an upload from the global-zero process."""
             _LightningModelCheckpoint._save_checkpoint(self, trainer, filepath)
             if trainer.is_global_zero:  # Only upload from the main process
                 self._upload_model(trainer=trainer, filepath=filepath)
@@ -311,14 +323,14 @@ if _LIGHTNING_AVAILABLE:
 if _PYTORCHLIGHTNING_AVAILABLE:
 
     class PytorchLightningModelCheckpoint(LitModelCheckpointMixin, _PytorchLightningModelCheckpoint):
-        """PyTorch Lightning ModelCheckpoint with LitModel support.
+        """Drop-in ModelCheckpoint for PyTorch Lightning that uploads to Lightning Cloud.
 
         Args:
             model_registry: Name of the model to upload in format 'organization/teamspace/modelname'.
-            keep_all_uploaded: Whether prevent deleting models from cloud if the checkpointing logic asks to do so.
-            clear_all_local: Whether to clear local models after uploading to the cloud.
-            args: Additional arguments to pass to the parent class.
-            kwargs: Additional keyword arguments to pass to the parent class.
+            keep_all_uploaded: If True, does not remove cloud versions when local pruning occurs.
+            clear_all_local: If True, removes local checkpoint files after successful upload.
+            args: Additional positional arguments forwarded to the base ModelCheckpoint.
+            kwargs: Additional keyword arguments forwarded to the base ModelCheckpoint.
         """
 
         def __init__(

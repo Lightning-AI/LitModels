@@ -24,18 +24,22 @@ def upload_model(
     verbose: Union[bool, int] = 1,
     metadata: Optional[dict[str, str]] = None,
 ) -> "UploadedModelInfo":
-    """Upload a checkpoint to the model store.
+    """Upload a local artifact (file or directory) to Lightning Cloud Models.
 
     Args:
-        name: Name of the model to upload. Must be in the format 'organization/teamspace/modelname'
-            where entity is either your username or the name of an organization you are part of.
-        model: The model to upload. Can be a path to a checkpoint file or a folder.
-        progress_bar: Whether to show a progress bar for the upload.
-        cloud_account: The name of the cloud account to store the Model in. Only required if it can't be determined
-            automatically.
-        verbose: Whether to print some additional information about the uploaded model.
-        metadata: Optional metadata to attach to the model. If not provided, a default metadata will be used.
+        name: Model registry name in the form 'organization/teamspace/modelname[:version]'.
+            If the version is omitted, one may be assigned automatically by the service.
+        model: Path to a checkpoint file or a directory containing model artifacts.
+        progress_bar: Whether to show a progress bar during the upload.
+        cloud_account: Optional cloud account to store the model in, when it cannot be auto-resolved.
+        verbose: Verbosity of informational output (0 = silent, 1 = print link once, 2 = print link always).
+        metadata: Optional metadata key/value pairs to attach to the uploaded model/version.
 
+    Returns:
+        UploadedModelInfo describing the created or updated model version.
+
+    Raises:
+        ValueError: If `model` is not a filesystem path. For in-memory objects, use `save_model()` instead.
     """
     if not isinstance(model, (str, Path)):
         raise ValueError(
@@ -62,20 +66,29 @@ def save_model(
     verbose: Union[bool, int] = 1,
     metadata: Optional[dict[str, str]] = None,
 ) -> "UploadedModelInfo":
-    """Upload a checkpoint to the model store.
+    """Serialize an in-memory model and upload it to Lightning Cloud Models.
+
+    Supported models:
+        - TorchScript (torch.jit.ScriptModule) → saved as .ts via model.save()
+        - PyTorch nn.Module → saved as .pth (state_dict via torch.save)
+        - Keras (tf.keras.Model) → saved as .keras via model.save()
+        - Any other Python object → saved as .pkl via pickle or joblib
 
     Args:
-        name: Name of the model to upload. Must be in the format 'organization/teamspace/modelname'
-            where entity is either your username or the name of an organization you are part of.
-        model: The model to upload. Can be a PyTorch model, or a Lightning model a.
-        progress_bar: Whether to show a progress bar for the upload.
-        cloud_account: The name of the cloud account to store the Model in. Only required if it can't be determined
-            automatically.
-        staging_dir: A directory where the model can be saved temporarily. If not provided, a temporary directory will
-            be created and used.
-        verbose: Whether to print some additional information about the uploaded model.
-        metadata: Optional metadata to attach to the model. If not provided, a default metadata will be used.
+        name: Model registry name in the form 'organization/teamspace/modelname[:version]'.
+        model: The in-memory model instance to serialize and upload.
+        progress_bar: Whether to show a progress bar during the upload.
+        cloud_account: Optional cloud account to store the model in, when it cannot be auto-resolved.
+        staging_dir: Optional temporary directory used for serialization. A new temp directory is created if omitted.
+        verbose: Verbosity of informational output (0 = silent, 1 = print link once, 2 = print link always).
+        metadata: Optional metadata key/value pairs to attach to the uploaded model/version. Integration markers are
+            added automatically.
 
+    Returns:
+        UploadedModelInfo describing the created or updated model version.
+
+    Raises:
+        ValueError: If `model` is a path. For file/folder uploads use `upload_model()` instead.
     """
     if isinstance(model, (str, Path)):
         raise ValueError(
@@ -120,17 +133,15 @@ def download_model(
     download_dir: Union[str, Path] = ".",
     progress_bar: bool = True,
 ) -> Union[str, list[str]]:
-    """Download a checkpoint from the model store.
+    """Download a model version from Lightning Cloud Models to a local directory.
 
     Args:
-        name: Name of the model to download. Must be in the format 'organization/teamspace/modelname'
-            where entity is either your username or the name of an organization you are part of.
-        download_dir: A path to directory where the model should be downloaded. Defaults
-            to the current working directory.
-        progress_bar: Whether to show a progress bar for the download.
+        name: Model registry name in the form 'organization/teamspace/modelname[:version]'.
+        download_dir: Directory where the artifact(s) will be stored. Defaults to the current working directory.
+        progress_bar: Whether to show a progress bar during the download.
 
     Returns:
-        The absolute path to the downloaded model file or folder.
+        str | list[str]: Absolute path(s) to the downloaded file(s) or directory content.
     """
     return download_model_files(
         name=name,
@@ -140,16 +151,22 @@ def download_model(
 
 
 def load_model(name: str, download_dir: str = ".") -> Any:
-    """Download a model from the model store and load it into memory.
+    """Download a model and load it into memory based on its file extension.
+
+    Supported formats:
+        - .ts → torch.jit.load
+        - .keras → keras.models.load_model
+        - .pkl → pickle/joblib via load_pickle
 
     Args:
-        name: Name of the model to download. Must be in the format 'organization/teamspace/modelname'
-            where entity is either your username or the name of an organization you are part of.
-        download_dir: A path to directory where the model should be downloaded. Defaults
-            to the current working directory.
+        name: Model registry name in the form 'organization/teamspace/modelname[:version]'.
+        download_dir: Directory to store the downloaded artifact(s) before loading. Defaults to the current directory.
 
     Returns:
-        The loaded model.
+        Any: The loaded model object.
+
+    Raises:
+        NotImplementedError: If multiple files are downloaded or the file extension is not supported.
     """
     download_paths = download_model(name=name, download_dir=download_dir)
     # filter out all Markdown, TXT and RST files

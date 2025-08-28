@@ -33,11 +33,15 @@ if _JOBLIB_AVAILABLE:
 
 
 def dump_pickle(model: Any, path: Union[str, Path]) -> None:
-    """Dump a model to a pickle file.
+    """Serialize a Python object to disk using joblib (if available) or pickle.
 
     Args:
-        model: The model to be pickled.
-        path: The path where the model will be saved.
+        model: The object to serialize.
+        path: Destination file path.
+
+    Notes:
+        - Uses joblib with compression (level 7) when available for smaller artifacts.
+        - Falls back to pickle with the highest protocol otherwise.
     """
     if _JOBLIB_AVAILABLE:
         joblib.dump(model, filename=path, compress=7)
@@ -47,13 +51,16 @@ def dump_pickle(model: Any, path: Union[str, Path]) -> None:
 
 
 def load_pickle(path: Union[str, Path]) -> Any:
-    """Load a model from a pickle file.
+    """Load a Python object from a joblib/pickle file.
 
     Args:
-        path: The path to the pickle file.
+        path: Path to the serialized artifact.
 
     Returns:
-        The unpickled model.
+        Any: The deserialized object.
+
+    Warning:
+        Loading pickle/joblib files can execute arbitrary code. Only open files from trusted sources.
     """
     if _JOBLIB_AVAILABLE:
         return joblib.load(path)

@@ -21,15 +21,14 @@ def duplicate_hf_model(
     verbose: int = 1,
     metadata: Optional[dict] = None,
 ) -> str:
-    """Downloads the model from Hugging Face and uploads it to Lightning Cloud.
+    """Download a model from Hugging Face and upload it to Lightning Cloud as a new model.
 
     Args:
-        hf_model: The name of the Hugging Face model to duplicate.
-        lit_model: The name of the Lightning Cloud model to create.
-        local_workdir:
-            The local working directory to use for the duplication process. If not set a temp folder will be created.
-        verbose: Shot a progress bar for the upload.
-        metadata: Optional metadata to attach to the model. If not provided, a default metadata will be used.
+        hf_model: Hugging Face model identifier, for example 'org/name' or 'user/name'.
+        lit_model: Target Lightning Cloud model name. If omitted, derived from `hf_model` by replacing '/' with '_'.
+        local_workdir: Working directory used for download and staging. A temporary directory is created if omitted.
+        verbose: Verbosity for upload progress (0 = silent, 1 = print link once, 2 = print link always).
+        metadata: Optional metadata to attach to the uploaded model. Integration markers are added automatically.
 
     Returns:
         The name of the duplicated model in Lightning Cloud.
