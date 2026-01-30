@@ -18,7 +18,8 @@ from tests.integrations import LIT_ORG, LIT_TEAMSPACE
 
 @pytest.mark.parametrize("name", ["/too/many/slashes", "org/model", "model-name"])
 @pytest.mark.parametrize("in_studio", [True, False])
-def test_upload_wrong_model_name(name, in_studio, monkeypatch):
+@mock.patch("litmodels.io.cloud.sdk_upload_model")
+def test_upload_wrong_model_name(mock_sdk_upload, name, in_studio, monkeypatch):
     if in_studio:
         # mock env variables as it would run in studio
         monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
