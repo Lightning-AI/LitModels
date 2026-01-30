@@ -36,6 +36,7 @@ markers = [
 ]
 filterwarnings = [
     "error::FutureWarning",
+    "ignore:`isinstance\\(treespec, LeafSpec\\)` is deprecated.*:FutureWarning",
 ]
 xfail_strict = true
 junit_duration_report = "call"
