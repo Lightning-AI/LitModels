@@ -36,6 +36,7 @@ jobs:
     timeout-minutes: 35
     env:
       TORCH_URL: "https://download.pytorch.org/whl/cpu/torch_stable.html"
+      DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
 
     steps:
       - uses: actions/checkout@v5
