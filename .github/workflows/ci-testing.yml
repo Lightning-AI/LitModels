@@ -8,6 +8,10 @@ on: # Trigger the workflow on push or pull request, but only for the main branch
   schedule:
     - cron: "0 0 * * *" # every day at midnight UTC
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.head_ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 defaults:
   run:
     shell: bash
@@ -18,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-24.04", "macOS-13", "windows-2022"]
+        os: ["ubuntu-24.04", "macOS-14", "windows-2022"]
         python-version: ["3.9", "3.12"]
         requires: ["latest"]
         dependency: ["lightning"]
@@ -26,12 +30,13 @@ jobs:
           - { os: "ubuntu-22.04", python-version: "3.9", requires: "oldest", dependency: "lightning" }
           - { os: "ubuntu-24.04", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
           - { os: "windows-2022", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
-          - { os: "macOS-13", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
+          - { os: "macOS-14", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
 
     # Timeout: https://stackoverflow.com/a/59076067/4521646
     timeout-minutes: 35
     env:
       TORCH_URL: "https://download.pytorch.org/whl/cpu/torch_stable.html"
+      DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
 
     steps:
       - uses: actions/checkout@v5
