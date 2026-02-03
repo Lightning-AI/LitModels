@@ -48,25 +48,29 @@ jobs:
     env:
       TORCH_URL: "https://download.pytorch.org/whl/cpu/torch_stable.html"
       DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
+      UV_TORCH_BACKEND: "cpu"
 
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+
+      - name: Install uv and set Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
+          activate-environment: true
+          enable-cache: true
 
       - name: Set min. dependencies
         if: matrix.requires == 'oldest'
         run: |
-          pip install 'lightning-utilities[cli]'
+          uv pip install 'lightning-utilities[cli]'
           python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt"]'
 
       - name: Install package & dependencies
         run: |
-          pip --version
-          pip install -e '.[test,extra]' -U -q --find-links $TORCH_URL
-          pip list
+          uv --version
+          uv pip install -e '.[test,extra]' --find-links="${TORCH_URL}"
+          uv pip list
 
       - name: Test integrations
         env:
@@ -90,6 +94,9 @@ jobs:
           env_vars: OS,PYTHON
           name: codecov-umbrella
           fail_ci_if_error: false
+
+      - name: Minimize uv cache
+        run: uv cache prune --ci
 
   integration-guardian:
     runs-on: ubuntu-latest
