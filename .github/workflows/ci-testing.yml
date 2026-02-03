@@ -23,11 +23,11 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-24.04", "macOS-14", "windows-2022"]
-        python-version: ["3.9", "3.12"]
+        python-version: ["3.10", "3.12"]
         requires: ["latest"]
         dependency: ["lightning"]
         include:
-          - { os: "ubuntu-22.04", python-version: "3.9", requires: "oldest", dependency: "lightning" }
+          - { os: "ubuntu-22.04", python-version: "3.10", requires: "oldest", dependency: "lightning" }
           - { os: "ubuntu-24.04", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
           - { os: "windows-2022", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
           - { os: "macOS-14", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
