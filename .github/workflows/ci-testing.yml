@@ -16,9 +16,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  UV_SYSTEM_PYTHON: 1
-
 jobs:
   pytester:
     runs-on: ${{ matrix.os }}
@@ -40,6 +37,7 @@ jobs:
     env:
       TORCH_URL: "https://download.pytorch.org/whl/cpu/torch_stable.html"
       DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
+      UV_TORCH_BACKEND: "cpu"
 
     steps:
       - uses: actions/checkout@v5
@@ -48,8 +46,8 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
+          activate-environment: true
           enable-cache: true
-          cache-dependency-glob: "**/requirements*.txt"
 
       - name: Set min. dependencies
         if: matrix.requires == 'oldest'
@@ -70,13 +68,10 @@ jobs:
         run: |
           set -e
           uv --version
-          uv pip install -e '.[test,extra]' --find-links $TORCH_URL
+          uv pip install -e '.[test,extra]' --find-links="${TORCH_URL}"
           uv pip list
           # check that right package was installed
           python -c "import ${{matrix.dependency}}; print(${{matrix.dependency}}.__version__)"
-
-      - name: Install coverage tools
-        run: uv pip install coverage pytest-cov
 
       - name: Tests with mocks
         run: |
