@@ -16,6 +16,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  UV_SYSTEM_PYTHON: 1
+
 jobs:
   pytester:
     runs-on: ${{ matrix.os }}
@@ -40,21 +43,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+
+      - name: Install uv and set Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
+          enable-cache: true
+          cache-dependency-glob: "**/requirements*.txt"
 
       - name: Set min. dependencies
         if: matrix.requires == 'oldest'
         run: |
-          pip install 'lightning-utilities[cli]'
+          uv pip install 'lightning-utilities[cli]'
           python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt"]'
 
       - name: Adjust requirements
         run: |
-          pip install 'lightning-utilities[cli]' -U -q
+          uv pip install 'lightning-utilities[cli]' -q
           python -m lightning_utilities.cli requirements replace-pkg \
             --old_package="lightning" \
             --new_package="${{matrix.dependency}}" \
@@ -64,11 +69,14 @@ jobs:
       - name: Install package & dependencies
         run: |
           set -e
-          pip --version
-          pip install -e '.[test,extra]' -U -q --find-links $TORCH_URL
-          pip list
+          uv --version
+          uv pip install -e '.[test,extra]' --find-links $TORCH_URL
+          uv pip list
           # check that right package was installed
           python -c "import ${{matrix.dependency}}; print(${{matrix.dependency}}.__version__)"
+
+      - name: Install coverage tools
+        run: uv pip install coverage pytest-cov
 
       - name: Tests with mocks
         run: |

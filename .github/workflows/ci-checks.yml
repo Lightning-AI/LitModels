@@ -1,5 +1,9 @@
 name: General checks
 
+# Note: These workflows use external reusable workflows from Lightning-AI/utilities
+# which currently use pip. To fully migrate to uv, these external workflows need to
+# be updated or forked. See: https://github.com/Lightning-AI/utilities
+
 on:
   push:
     branches: [main, "release/*"]

@@ -1,21 +1,47 @@
 name: "Build (& deploy) Docs"
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+env:
+  UV_SYSTEM_PYTHON: 1
+
 jobs:
   build-docs:
-    uses: Lightning-AI/utilities/.github/workflows/check-docs.yml@main
-    with:
-      requirements-file: "_requirements/_docs.txt"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
 
-  # https://github.com/marketplace/actions/deploy-to-github-pages
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.10"
+          enable-cache: true
+
+      - name: Install docs dependencies
+        run: |
+          uv pip install -r _requirements/_docs.txt
+          uv pip install -e .
+
+      - name: Build documentation
+        working-directory: docs
+        run: make html --jobs $(nproc)
+
+      - name: Upload built docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-html-${{ github.sha }}
+          path: docs/build/html
+          retention-days: 1
+
   docs-deploy:
     needs: build-docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5 # deploy needs git credentials
+
       - name: Download prepared docs
         uses: actions/download-artifact@v5
         with:

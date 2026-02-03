@@ -11,6 +11,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  UV_SYSTEM_PYTHON: 1
+
 jobs:
   access-secrets:
     # try to access secrets to ensure they are available
@@ -51,22 +54,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+
+      - name: Install uv and set Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
+          enable-cache: true
+          cache-dependency-glob: "**/requirements*.txt"
 
       - name: Set min. dependencies
         if: matrix.requires == 'oldest'
         run: |
-          pip install 'lightning-utilities[cli]'
+          uv pip install 'lightning-utilities[cli]'
           python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt"]'
 
       - name: Install package & dependencies
         run: |
-          pip --version
-          pip install -e '.[test,extra]' -U -q --find-links $TORCH_URL
-          pip list
+          uv --version
+          uv pip install -e '.[test,extra]' --find-links $TORCH_URL
+          uv pip list
+
+      - name: Install coverage tools
+        run: uv pip install coverage pytest-cov
 
       - name: Test integrations
         env:
