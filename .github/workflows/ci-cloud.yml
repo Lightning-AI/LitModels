@@ -97,7 +97,7 @@ jobs:
 
       - name: Minimize uv cache
         run: uv cache prune --ci
-        
+
   integration-guardian:
     runs-on: ubuntu-latest
     needs: integration
