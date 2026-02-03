@@ -4,6 +4,10 @@ name: PyPI Release
 on: # Trigger the workflow on push or pull request, but only for the main branch
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/release-pypi.yml"
   release:
     types: [published]
 
@@ -12,18 +16,27 @@ on: # Trigger the workflow on push or pull request, but only for the main branch
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v6
+
+      - name: Install uv and set Python 3.10
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.10"
+          activate-environment: true
+          enable-cache: true
 
       - name: Install dependencies
-        run: pip install -U -r _requirements/_ci.txt
+        run: |
+          uv pip install -U -r _requirements/_ci.txt
+          uv pip list
+
       - name: Build package
         run: python -m build
+
       - name: Check package
-        run: twine check dist/*
+        run: twine check dist/* --strict
 
       # We do this, since failures on test.pypi aren't that bad
       - name: Publish to Test PyPI
