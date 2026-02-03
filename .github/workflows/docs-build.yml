@@ -15,15 +15,15 @@ jobs:
     needs: build-docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5 # deploy needs git credentials
+      - uses: actions/checkout@v6 # deploy needs git credentials
       - name: Download prepared docs
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: docs-html-${{ github.sha }}
           path: docs/build/html
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.7.3
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         if: ${{ github.event_name == 'push' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
