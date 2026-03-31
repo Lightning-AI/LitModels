@@ -6,9 +6,30 @@ on:
 
 jobs:
   build-docs:
-    uses: Lightning-AI/utilities/.github/workflows/check-docs.yml@main
-    with:
-      requirements-file: "_requirements/_docs.txt"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv and set Python 3.10
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.10"
+          activate-environment: true
+          enable-cache: true
+
+      - name: Install package & docs dependencies
+        run: uv pip install -e '.[docs]'
+
+      - name: Build docs
+        env:
+          SPHINX_MOCK_REQUIREMENTS: "0"
+        run: python -m sphinx -b html -W --keep-going docs/source docs/build/html
+
+      - name: Upload prepared docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-html-${{ github.sha }}
+          path: docs/build/html
 
   # https://github.com/marketplace/actions/deploy-to-github-pages
   docs-deploy:

@@ -26,11 +26,12 @@ jobs:
         python-version: ["3.10", "3.12"]
         requires: ["latest"]
         dependency: ["lightning"]
+        dependency_package: ["lightning"]
         include:
-          - { os: "ubuntu-22.04", python-version: "3.10", requires: "oldest", dependency: "lightning" }
-          - { os: "ubuntu-24.04", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
-          - { os: "windows-2022", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
-          - { os: "macOS-14", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
+          - { os: "ubuntu-22.04", python-version: "3.10", requires: "oldest", dependency: "lightning", dependency_package: "lightning" }
+          - { os: "ubuntu-24.04", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning", dependency_package: "pytorch-lightning" }
+          - { os: "windows-2022", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning", dependency_package: "pytorch-lightning" }
+          - { os: "macOS-14", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning", dependency_package: "pytorch-lightning" }
 
     # Timeout: https://stackoverflow.com/a/59076067/4521646
     timeout-minutes: 35
@@ -53,16 +54,15 @@ jobs:
         if: matrix.requires == 'oldest'
         run: |
           uv pip install 'lightning-utilities[cli]'
-          python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt"]'
+          python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt", "pyproject.toml"]'
 
       - name: Adjust requirements
         run: |
           uv pip install 'lightning-utilities[cli]' -q
           python -m lightning_utilities.cli requirements replace-pkg \
             --old_package="lightning" \
-            --new_package="${{matrix.dependency}}" \
-            --req_files='["_requirements/extra.txt"]'
-          cat _requirements/extra.txt
+            --new_package="${{ matrix.dependency_package }}" \
+            --req_files='["pyproject.toml"]'
 
       - name: Install package & dependencies
         run: |

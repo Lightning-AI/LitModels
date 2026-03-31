@@ -1,3 +1,0 @@
-lightning >= 2.0.0
-numpy <2.0.0 ; platform_system == "Darwin" # compatibility fix for Torch
-joblib >= 1.0.0

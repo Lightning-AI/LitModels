@@ -1,12 +1,94 @@
-[metadata]
-license_file = "LICENSE"
-description-file = "README.md"
-
 [build-system]
 requires = [
-    "setuptools",
+    "setuptools>=69",
     "wheel",
 ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "litmodels"
+description = "Lightning AI Model hub."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Lightning-AI et al.", email = "community@lightning.ai" },
+]
+requires-python = ">=3.8"
+keywords = ["deep learning", "pytorch", "AI"]
+classifiers = [
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dynamic = ["version", "dependencies"]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/Lightning-AI/litModels/issues"
+Documentation = "https://lightning-ai.github.io/litModels/"
+"Source Code" = "https://github.com/Lightning-AI/litModels"
+Homepage = "https://github.com/Lightning-AI/litModels"
+Download = "https://github.com/Lightning-AI/litModels"
+
+[project.optional-dependencies]
+build = [
+    "build ==1.4.*",
+    "twine ==6.2.*",
+]
+docs = [
+    "sphinx >=6.0,<8.0",
+    "myst-parser >=2.0.0",
+    "nbsphinx >=0.8.5",
+    "pandoc >=1.0",
+    "pypandoc-binary",
+    "docutils >=0.16",
+    "sphinxcontrib-fulltoc >=1.0",
+    "sphinxcontrib-mockautodoc",
+    "sphinx-autodoc-typehints >=1.0",
+    "sphinx-paramlinks >=0.5.1",
+    "sphinx-togglebutton >=0.2",
+    "sphinx-copybutton >=0.3",
+    "pt-lightning-sphinx-theme @ https://github.com/Lightning-AI/lightning_sphinx_theme/archive/master.zip",
+]
+extra = [
+    "lightning >= 2.0.0",
+    "numpy <2.0.0 ; platform_system == 'Darwin'",
+    "joblib >= 1.0.0",
+]
+test = [
+    "coverage >=5.0",
+    "pytest >=6.0",
+    "pytest-cov",
+    "pytest-mock",
+    "pytorch-lightning >=2.0",
+    "scikit-learn >=1.0",
+    "huggingface-hub >=0.29.0",
+    "tensorflow >=2.0",
+]
+typing = [
+    "mypy ==1.19.1",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { attr = "litmodels.__about__.__version__" }
+dependencies = { file = ["requirements.txt"] }
 
 
 [tool.check-manifest]
@@ -118,7 +200,6 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"setup.py" = ["D100", "SIM115"]
 "__about__.py" = ["D100"]
 "__init__.py" = ["D100", "E402"]
 "examples/**" = ["D"] # todo
