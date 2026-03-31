@@ -10,6 +10,7 @@ from lightning_sdk.models import _extend_model_name_with_teamspace, _parse_org_t
 from lightning_sdk.models import delete_model as sdk_delete_model
 from lightning_sdk.models import download_model as sdk_download_model
 from lightning_sdk.models import upload_model as sdk_upload_model
+from lightning_sdk.api.utils import Experiment
 
 import litmodels
 
@@ -49,6 +50,7 @@ def upload_model_files(
     cloud_account: Optional[str] = None,
     verbose: Union[bool, int] = 1,
     metadata: Optional[dict[str, str]] = None,
+    experiment: Optional[Experiment] = None,
 ) -> "UploadedModelInfo":
     """Upload local artifact(s) to Lightning Cloud using the SDK.
 
@@ -59,6 +61,7 @@ def upload_model_files(
         cloud_account: Optional cloud account to store the model in, when it cannot be auto-resolved.
         verbose: Verbosity for printing the model link (0 = no output, 1 = print once, 2 = print always).
         metadata: Optional metadata to attach to the model/version. The package version is added automatically.
+        experiment: Optional experiment producing this model
 
     Returns:
         UploadedModelInfo describing the created or updated model version.
@@ -72,6 +75,7 @@ def upload_model_files(
         progress_bar=progress_bar,
         cloud_account=cloud_account,
         metadata=metadata,
+        experiment=experiment
     )
     if verbose:
         _print_model_link(name, verbose)

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Optional, Union
 
 from litmodels.io.cloud import download_model_files, upload_model_files
 from litmodels.io.utils import _KERAS_AVAILABLE, _PYTORCH_AVAILABLE, dump_pickle, load_pickle
+from lightning_sdk.api.utils import Experiment
 
 if _PYTORCH_AVAILABLE:
     import torch
@@ -23,6 +24,7 @@ def upload_model(
     cloud_account: Optional[str] = None,
     verbose: Union[bool, int] = 1,
     metadata: Optional[dict[str, str]] = None,
+    experiment: Optional[Experiment] = None,
 ) -> "UploadedModelInfo":
     """Upload a local artifact (file or directory) to Lightning Cloud Models.
 
@@ -34,6 +36,7 @@ def upload_model(
         cloud_account: Optional cloud account to store the model in, when it cannot be auto-resolved.
         verbose: Verbosity of informational output (0 = silent, 1 = print link once, 2 = print link always).
         metadata: Optional metadata key/value pairs to attach to the uploaded model/version.
+        experiment: Optional experiment producing this model.
 
     Returns:
         UploadedModelInfo describing the created or updated model version.
@@ -54,6 +57,7 @@ def upload_model(
         cloud_account=cloud_account,
         verbose=verbose,
         metadata=metadata,
+        experiment=experiment,
     )
 
 
@@ -65,6 +69,7 @@ def save_model(
     staging_dir: Optional[str] = None,
     verbose: Union[bool, int] = 1,
     metadata: Optional[dict[str, str]] = None,
+    experiment: Optional[Experiment] = None,
 ) -> "UploadedModelInfo":
     """Serialize an in-memory model and upload it to Lightning Cloud Models.
 
@@ -83,6 +88,7 @@ def save_model(
         verbose: Verbosity of informational output (0 = silent, 1 = print link once, 2 = print link always).
         metadata: Optional metadata key/value pairs to attach to the uploaded model/version. Integration markers are
             added automatically.
+        experiment: Optional experiment producing this model.
 
     Returns:
         UploadedModelInfo describing the created or updated model version.
@@ -125,6 +131,7 @@ def save_model(
         cloud_account=cloud_account,
         verbose=verbose,
         metadata=metadata,
+        experiment=experiment,
     )
 
 

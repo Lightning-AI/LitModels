@@ -1,2 +1,2 @@
-lightning-sdk >=0.2.11
+lightning-sdk >=2026.03.31
 lightning-utilities
