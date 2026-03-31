@@ -5,12 +5,12 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Union
 
+from lightning_sdk.api.utils import Experiment
 from lightning_sdk.lightning_cloud.env import LIGHTNING_CLOUD_URL
 from lightning_sdk.models import _extend_model_name_with_teamspace, _parse_org_teamspace_model_version
 from lightning_sdk.models import delete_model as sdk_delete_model
 from lightning_sdk.models import download_model as sdk_download_model
 from lightning_sdk.models import upload_model as sdk_upload_model
-from lightning_sdk.api.utils import Experiment
 
 import litmodels
 
@@ -75,7 +75,7 @@ def upload_model_files(
         progress_bar=progress_bar,
         cloud_account=cloud_account,
         metadata=metadata,
-        experiment=experiment
+        experiment=experiment,
     )
     if verbose:
         _print_model_link(name, verbose)
