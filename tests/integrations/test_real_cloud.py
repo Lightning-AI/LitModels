@@ -8,7 +8,7 @@ import pytest
 import torch
 from lightning_sdk import Teamspace
 from lightning_sdk.lightning_cloud.rest_client import GridRestClient
-from lightning_sdk.utils.resolve import _resolve_teamspace
+from lightning_sdk.utils.resolve import _get_authed_user, _resolve_teamspace
 
 from litmodels import download_model, load_model, save_model, upload_model
 from litmodels.integrations.duplicate import duplicate_hf_model
@@ -28,6 +28,12 @@ def _prepare_variables(test_name: str) -> tuple[Teamspace, str, str]:
     teamspace = _resolve_teamspace(org=LIT_ORG, teamspace=LIT_TEAMSPACE, user=None)
     org_team = f"{teamspace.owner.name}/{teamspace.name}"
     return teamspace, org_team, model_name
+
+
+def _mock_studio_env(monkeypatch) -> None:
+    monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
+    monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+    monkeypatch.setenv("LIGHTNING_USERNAME", _get_authed_user().name)
 
 
 def _cleanup_model(teamspace: Teamspace, model_name: str, expected_num_versions: Optional[int] = None) -> None:
@@ -53,9 +59,7 @@ def _cleanup_model(teamspace: Teamspace, model_name: str, expected_num_versions:
 def test_upload_download_model(in_studio, monkeypatch, tmp_path):
     """Verify that the model is uploaded to the teamspace"""
     if in_studio:
-        # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
-        monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+        _mock_studio_env(monkeypatch)
 
     # create a dummy file
     file_path = tmp_path / "dummy.txt"
@@ -104,9 +108,7 @@ def test_upload_download_model(in_studio, monkeypatch, tmp_path):
 @pytest.mark.cloud
 def test_lightning_default_checkpointing(importing, in_studio, monkeypatch, tmp_path):
     if in_studio:
-        # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
-        monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+        _mock_studio_env(monkeypatch)
 
     if importing == "lightning":
         from lightning import Trainer
@@ -158,9 +160,7 @@ def test_lightning_plain_resume(trainer_method, registry, importing, in_studio, 
         from pytorch_lightning.demos.boring_classes import BoringModel
 
     if in_studio:
-        # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
-        monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+        _mock_studio_env(monkeypatch)
 
     trainer = Trainer(max_epochs=1, limit_train_batches=50, limit_val_batches=20, default_root_dir=tmp_path)
     trainer.fit(BoringModel())
