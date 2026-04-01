@@ -20,6 +20,11 @@ from tests.integrations import LIT_TEAMSPACE, LIT_USER
 @pytest.mark.parametrize("in_studio", [True, False])
 @mock.patch("litmodels.io.cloud.sdk_upload_model")
 def test_upload_wrong_model_name(mock_sdk_upload, name, in_studio, monkeypatch):
+    teamspace = mock.MagicMock()
+    teamspace.name = LIT_TEAMSPACE
+    teamspace.owner.name = LIT_USER
+    monkeypatch.setattr("lightning_sdk.models._resolve_teamspace", mock.MagicMock(return_value=teamspace if in_studio else None))
+
     if in_studio:
         # mock env variables as it would run in studio
         monkeypatch.setenv("LIGHTNING_USERNAME", LIT_USER)
@@ -40,7 +45,13 @@ def test_upload_wrong_model_name(mock_sdk_upload, name, in_studio, monkeypatch):
 
 @pytest.mark.parametrize("name", ["/too/many/slashes", "org/model", "model-name"])
 @pytest.mark.parametrize("in_studio", [True, False])
-def test_download_wrong_model_name(name, in_studio, monkeypatch):
+@mock.patch("litmodels.io.cloud.sdk_download_model")
+def test_download_wrong_model_name(mock_sdk_download, name, in_studio, monkeypatch):
+    teamspace = mock.MagicMock()
+    teamspace.name = LIT_TEAMSPACE
+    teamspace.owner.name = LIT_USER
+    monkeypatch.setattr("lightning_sdk.models._resolve_teamspace", mock.MagicMock(return_value=teamspace if in_studio else None))
+
     if in_studio:
         # mock env variables as it would run in studio
         monkeypatch.setenv("LIGHTNING_USERNAME", LIT_USER)
