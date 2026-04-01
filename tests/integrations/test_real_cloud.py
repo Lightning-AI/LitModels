@@ -18,8 +18,8 @@ from litmodels.io.utils import _KERAS_AVAILABLE
 from tests.integrations import (
     _SKIP_IF_LIGHTNING_BELLOW_2_5_1,
     _SKIP_IF_PYTORCHLIGHTNING_BELLOW_2_5_1,
-    LIT_USER,
     LIT_TEAMSPACE,
+    LIT_USER,
 )
 
 

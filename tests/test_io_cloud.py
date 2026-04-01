@@ -13,7 +13,7 @@ import litmodels
 from litmodels import download_model, load_model, save_model
 from litmodels.io import upload_model_files
 from litmodels.io.utils import _KERAS_AVAILABLE
-from tests.integrations import LIT_USER, LIT_TEAMSPACE
+from tests.integrations import LIT_TEAMSPACE, LIT_USER
 
 
 @pytest.mark.parametrize("name", ["/too/many/slashes", "org/model", "model-name"])
