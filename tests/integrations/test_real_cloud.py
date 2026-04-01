@@ -7,8 +7,9 @@ from typing import Optional
 import pytest
 import torch
 from lightning_sdk import Teamspace
+from lightning_sdk.lightning_cloud.env import LIGHTNING_CLOUD_URL
 from lightning_sdk.lightning_cloud.rest_client import GridRestClient
-from lightning_sdk.utils.resolve import _resolve_teamspace
+from lightning_sdk.utils.resolve import _get_authed_user, _resolve_teamspace
 
 from litmodels import download_model, load_model, save_model, upload_model
 from litmodels.integrations.duplicate import duplicate_hf_model
@@ -18,16 +19,22 @@ from litmodels.io.utils import _KERAS_AVAILABLE
 from tests.integrations import (
     _SKIP_IF_LIGHTNING_BELLOW_2_5_1,
     _SKIP_IF_PYTORCHLIGHTNING_BELLOW_2_5_1,
-    LIT_ORG,
     LIT_TEAMSPACE,
+    LIT_USER,
 )
 
 
 def _prepare_variables(test_name: str) -> tuple[Teamspace, str, str]:
     model_name = f"ci-test_integrations_{test_name}+{os.urandom(8).hex()}"
-    teamspace = _resolve_teamspace(org=LIT_ORG, teamspace=LIT_TEAMSPACE, user=None)
-    org_team = f"{teamspace.owner.name}/{teamspace.name}"
-    return teamspace, org_team, model_name
+    teamspace = _resolve_teamspace(user=LIT_USER, teamspace=LIT_TEAMSPACE, org=None)
+    user_team = f"{teamspace.owner.name}/{teamspace.name}"
+    return teamspace, user_team, model_name
+
+
+def _mock_studio_env(monkeypatch) -> None:
+    monkeypatch.setenv("LIGHTNING_USERNAME", LIT_USER)
+    monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+    monkeypatch.setenv("LIGHTNING_USERNAME", _get_authed_user().name)
 
 
 def _cleanup_model(teamspace: Teamspace, model_name: str, expected_num_versions: Optional[int] = None) -> None:
@@ -53,9 +60,7 @@ def _cleanup_model(teamspace: Teamspace, model_name: str, expected_num_versions:
 def test_upload_download_model(in_studio, monkeypatch, tmp_path):
     """Verify that the model is uploaded to the teamspace"""
     if in_studio:
-        # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
-        monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+        _mock_studio_env(monkeypatch)
 
     # create a dummy file
     file_path = tmp_path / "dummy.txt"
@@ -72,7 +77,7 @@ def test_upload_download_model(in_studio, monkeypatch, tmp_path):
 
     # validate the output
     assert (
-        f"Model uploaded successfully. Link to the model: 'https://lightning.ai/{org_team}/models/{model_name}'"
+        f"Model uploaded successfully. Link to the model: '{LIGHTNING_CLOUD_URL}/{org_team}/models/{model_name}'"
     ) in out.getvalue()
 
     os.remove(file_path)
@@ -104,9 +109,7 @@ def test_upload_download_model(in_studio, monkeypatch, tmp_path):
 @pytest.mark.cloud
 def test_lightning_default_checkpointing(importing, in_studio, monkeypatch, tmp_path):
     if in_studio:
-        # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
-        monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+        _mock_studio_env(monkeypatch)
 
     if importing == "lightning":
         from lightning import Trainer
@@ -158,9 +161,7 @@ def test_lightning_plain_resume(trainer_method, registry, importing, in_studio, 
         from pytorch_lightning.demos.boring_classes import BoringModel
 
     if in_studio:
-        # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
-        monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
+        _mock_studio_env(monkeypatch)
 
     trainer = Trainer(max_epochs=1, limit_train_batches=50, limit_val_batches=20, default_root_dir=tmp_path)
     trainer.fit(BoringModel())
@@ -309,7 +310,7 @@ def test_duplicate_real_hf_model(tmp_path):
 
     # model name with random hash
     model_name = f"litmodels_hf_model+{os.urandom(8).hex()}"
-    teamspace = _resolve_teamspace(org=LIT_ORG, teamspace=LIT_TEAMSPACE, user=None)
+    teamspace = _resolve_teamspace(org=None, teamspace=LIT_TEAMSPACE, user=LIT_USER)
     org_team = f"{teamspace.owner.name}/{teamspace.name}"
 
     duplicate_hf_model(hf_model="google/t5-efficient-tiny", lit_model=f"{org_team}/{model_name}")
@@ -327,8 +328,7 @@ def test_duplicate_real_hf_model(tmp_path):
 def test_list_available_teamspaces():
     teams = _list_available_teamspaces()
     assert len(teams) > 0
-    # using sanitized teamspace name
-    assert f"{LIT_ORG}/oss-litmodels" in teams
+    assert f"{LIT_USER}/{LIT_TEAMSPACE}" in teams
 
 
 @pytest.mark.cloud

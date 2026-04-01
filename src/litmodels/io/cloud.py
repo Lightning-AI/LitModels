@@ -63,18 +63,21 @@ def upload_model_files(
     Returns:
         UploadedModelInfo describing the created or updated model version.
     """
+    resolved_name = _extend_model_name_with_teamspace(name)
+    _parse_org_teamspace_model_version(resolved_name)
+
     if not metadata:
         metadata = {}
     metadata.update({"litModels": litmodels.__version__})
     info = sdk_upload_model(
-        name=name,
+        name=resolved_name,
         path=path,
         progress_bar=progress_bar,
         cloud_account=cloud_account,
         metadata=metadata,
     )
     if verbose:
-        _print_model_link(name, verbose)
+        _print_model_link(resolved_name, verbose)
     return info
 
 
@@ -93,8 +96,11 @@ def download_model_files(
     Returns:
         str | list[str]: Absolute path(s) to the downloaded artifact(s).
     """
+    resolved_name = _extend_model_name_with_teamspace(name)
+    _parse_org_teamspace_model_version(resolved_name)
+
     return sdk_download_model(
-        name=name,
+        name=resolved_name,
         download_dir=download_dir,
         progress_bar=progress_bar,
     )
