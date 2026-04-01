@@ -1,2 +1,3 @@
+litlogger >=2026.03.17
 lightning-sdk >=2026.03.31
-lightning-utilities
+lightning-utilities<=0.15.3

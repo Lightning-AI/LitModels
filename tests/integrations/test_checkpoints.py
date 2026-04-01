@@ -4,7 +4,6 @@ from unittest import mock
 
 import pytest
 
-import litmodels
 from tests.integrations import _SKIP_IF_LIGHTNING_MISSING, _SKIP_IF_PYTORCHLIGHTNING_MISSING
 
 
@@ -20,8 +19,8 @@ from tests.integrations import _SKIP_IF_LIGHTNING_MISSING, _SKIP_IF_PYTORCHLIGHT
 )
 @pytest.mark.parametrize("clear_all_local", [True, False])
 @pytest.mark.parametrize("keep_all_uploaded", [True, False])
-@mock.patch("litmodels.io.cloud.sdk_delete_model")
-@mock.patch("litmodels.io.cloud.sdk_upload_model")
+@mock.patch("litmodels.integrations.checkpoints.delete_model_version")
+@mock.patch("litmodels.integrations.checkpoints.upload_model")
 @mock.patch("litmodels.integrations.checkpoints.Auth")
 def test_lightning_checkpoint_callback(
     mock_auth,
@@ -67,7 +66,6 @@ def test_lightning_checkpoint_callback(
     expected_org = expected_model_registry["org"]
     expected_teamspace = expected_model_registry["teamspace"]
     expected_model = expected_model_registry["model"]
-    mock_upload_model.return_value.name = f"{expected_org}/{expected_teamspace}/{expected_model}"
     monkeypatch.setattr(
         "litmodels.integrations.checkpoints.LitModelCheckpointMixin.default_model_name",
         mock.MagicMock(return_value=expected_boring_model),
@@ -101,10 +99,8 @@ def test_lightning_checkpoint_callback(
     assert mock_upload_model.call_args_list == [
         mock.call(
             name=f"{expected_org}/{expected_teamspace}/{expected_model}:{v}",
-            path=mock.ANY,
-            progress_bar=True,
-            cloud_account=None,
-            metadata={"litModels.integration": LitModelCheckpoint.__name__, "litModels": litmodels.__version__},
+            model=mock.ANY,
+            metadata={"litModels.integration": LitModelCheckpoint.__name__},
         )
         for v in ("epoch=0-step=64", "epoch=1-step=128")
     ]
@@ -115,12 +111,13 @@ def test_lightning_checkpoint_callback(
     assert mock_delete_model.call_count == expected_cloud_removals
     if expected_cloud_removals:
         mock_delete_model.assert_called_once_with(
-            name=f"{expected_org}/{expected_teamspace}/{expected_model}:epoch=0-step=64"
+            name=f"{expected_org}/{expected_teamspace}/{expected_model}",
+            version="epoch=0-step=64",
         )
 
     # Verify paths match the expected pattern
     for call_args in mock_upload_model.call_args_list:
-        path = call_args[1]["path"]
+        path = call_args[1]["model"]
         assert re.match(r".*[/\\]lightning_logs[/\\]version_\d+[/\\]checkpoints[/\\]epoch=\d+-step=\d+\.ckpt$", path)
 
 
