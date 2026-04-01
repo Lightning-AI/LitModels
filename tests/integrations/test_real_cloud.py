@@ -327,8 +327,7 @@ def test_duplicate_real_hf_model(tmp_path):
 def test_list_available_teamspaces():
     teams = _list_available_teamspaces()
     assert len(teams) > 0
-    # using sanitized teamspace name
-    assert f"{LIT_ORG}/oss-litmodels" in teams
+    assert f"{LIT_ORG}/{LIT_TEAMSPACE}" in teams
 
 
 @pytest.mark.cloud
