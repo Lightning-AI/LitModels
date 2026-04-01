@@ -23,7 +23,9 @@ def test_upload_wrong_model_name(mock_sdk_upload, name, in_studio, monkeypatch):
     teamspace = mock.MagicMock()
     teamspace.name = LIT_TEAMSPACE
     teamspace.owner.name = LIT_USER
-    monkeypatch.setattr("lightning_sdk.models._resolve_teamspace", mock.MagicMock(return_value=teamspace if in_studio else None))
+    monkeypatch.setattr(
+        "lightning_sdk.models._resolve_teamspace", mock.MagicMock(return_value=teamspace if in_studio else None)
+    )
 
     if in_studio:
         # mock env variables as it would run in studio
@@ -50,7 +52,9 @@ def test_download_wrong_model_name(mock_sdk_download, name, in_studio, monkeypat
     teamspace = mock.MagicMock()
     teamspace.name = LIT_TEAMSPACE
     teamspace.owner.name = LIT_USER
-    monkeypatch.setattr("lightning_sdk.models._resolve_teamspace", mock.MagicMock(return_value=teamspace if in_studio else None))
+    monkeypatch.setattr(
+        "lightning_sdk.models._resolve_teamspace", mock.MagicMock(return_value=teamspace if in_studio else None)
+    )
 
     if in_studio:
         # mock env variables as it would run in studio
