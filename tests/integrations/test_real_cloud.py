@@ -7,6 +7,7 @@ from typing import Optional
 import pytest
 import torch
 from lightning_sdk import Teamspace
+from lightning_sdk.lightning_cloud.env import LIGHTNING_CLOUD_URL
 from lightning_sdk.lightning_cloud.rest_client import GridRestClient
 from lightning_sdk.utils.resolve import _get_authed_user, _resolve_teamspace
 
@@ -76,7 +77,7 @@ def test_upload_download_model(in_studio, monkeypatch, tmp_path):
 
     # validate the output
     assert (
-        f"Model uploaded successfully. Link to the model: 'https://lightning.ai/{org_team}/models/{model_name}'"
+        f"Model uploaded successfully. Link to the model: '{LIGHTNING_CLOUD_URL}/{org_team}/models/{model_name}'"
     ) in out.getvalue()
 
     os.remove(file_path)
