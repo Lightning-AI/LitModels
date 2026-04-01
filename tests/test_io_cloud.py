@@ -13,7 +13,7 @@ import litmodels
 from litmodels import download_model, load_model, save_model
 from litmodels.io import upload_model_files
 from litmodels.io.utils import _KERAS_AVAILABLE
-from tests.integrations import LIT_ORG, LIT_TEAMSPACE
+from tests.integrations import LIT_USER, LIT_TEAMSPACE
 
 
 @pytest.mark.parametrize("name", ["/too/many/slashes", "org/model", "model-name"])
@@ -22,7 +22,7 @@ from tests.integrations import LIT_ORG, LIT_TEAMSPACE
 def test_upload_wrong_model_name(mock_sdk_upload, name, in_studio, monkeypatch):
     if in_studio:
         # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
+        monkeypatch.setenv("LIGHTNING_USERNAME", LIT_USER)
         monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
         monkeypatch.setattr("lightning_sdk.organization.Organization", mock.MagicMock)
         monkeypatch.setattr("lightning_sdk.teamspace.Teamspace", mock.MagicMock)
@@ -43,7 +43,7 @@ def test_upload_wrong_model_name(mock_sdk_upload, name, in_studio, monkeypatch):
 def test_download_wrong_model_name(name, in_studio, monkeypatch):
     if in_studio:
         # mock env variables as it would run in studio
-        monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
+        monkeypatch.setenv("LIGHTNING_USERNAME", LIT_USER)
         monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
         monkeypatch.setattr("lightning_sdk.organization.Organization", mock.MagicMock)
         monkeypatch.setattr("lightning_sdk.teamspace.Teamspace", mock.MagicMock)

@@ -18,5 +18,5 @@ _SKIP_IF_PYTORCHLIGHTNING_BELLOW_2_5_1 = pytest.mark.skipif(
     not _PYTORCHLIGHTNING_GREATER_EQUAL_2_5_1, reason="PyTorch Lightning without integration introduced in 2.5.1"
 )
 
-LIT_ORG = "lightning-ai"
+LIT_USER = "i-am-ci"
 LIT_TEAMSPACE = "oss-litlogger"

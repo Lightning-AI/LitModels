@@ -18,20 +18,20 @@ from litmodels.io.utils import _KERAS_AVAILABLE
 from tests.integrations import (
     _SKIP_IF_LIGHTNING_BELLOW_2_5_1,
     _SKIP_IF_PYTORCHLIGHTNING_BELLOW_2_5_1,
-    LIT_ORG,
+    LIT_USER,
     LIT_TEAMSPACE,
 )
 
 
 def _prepare_variables(test_name: str) -> tuple[Teamspace, str, str]:
     model_name = f"ci-test_integrations_{test_name}+{os.urandom(8).hex()}"
-    teamspace = _resolve_teamspace(org=LIT_ORG, teamspace=LIT_TEAMSPACE, user=None)
-    org_team = f"{teamspace.owner.name}/{teamspace.name}"
-    return teamspace, org_team, model_name
+    teamspace = _resolve_teamspace(user=LIT_USER, teamspace=LIT_TEAMSPACE, org=None)
+    user_team = f"{teamspace.owner.name}/{teamspace.name}"
+    return teamspace, user_team, model_name
 
 
 def _mock_studio_env(monkeypatch) -> None:
-    monkeypatch.setenv("LIGHTNING_ORG", LIT_ORG)
+    monkeypatch.setenv("LIGHTNING_USERNAME", LIT_USER)
     monkeypatch.setenv("LIGHTNING_TEAMSPACE", LIT_TEAMSPACE)
     monkeypatch.setenv("LIGHTNING_USERNAME", _get_authed_user().name)
 
@@ -309,7 +309,7 @@ def test_duplicate_real_hf_model(tmp_path):
 
     # model name with random hash
     model_name = f"litmodels_hf_model+{os.urandom(8).hex()}"
-    teamspace = _resolve_teamspace(org=LIT_ORG, teamspace=LIT_TEAMSPACE, user=None)
+    teamspace = _resolve_teamspace(org=None, teamspace=LIT_TEAMSPACE, user=LIT_USER)
     org_team = f"{teamspace.owner.name}/{teamspace.name}"
 
     duplicate_hf_model(hf_model="google/t5-efficient-tiny", lit_model=f"{org_team}/{model_name}")
@@ -327,7 +327,7 @@ def test_duplicate_real_hf_model(tmp_path):
 def test_list_available_teamspaces():
     teams = _list_available_teamspaces()
     assert len(teams) > 0
-    assert f"{LIT_ORG}/{LIT_TEAMSPACE}" in teams
+    assert f"{LIT_USER}/{LIT_TEAMSPACE}" in teams
 
 
 @pytest.mark.cloud
