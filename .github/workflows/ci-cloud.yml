@@ -12,27 +12,7 @@ defaults:
     shell: bash
 
 jobs:
-  access-secrets:
-    # try to access secrets to ensure they are available
-    # if not set job output to be false
-    runs-on: ubuntu-latest
-    outputs:
-      secrets_available: ${{ steps.check_secrets.outputs.secrets_available }}
-    steps:
-      - name: Check secrets
-        id: check_secrets
-        run: |
-          if [[ -z "${{ secrets.LIGHTNING_USER_ID }}" || -z "${{ secrets.LIGHTNING_API_KEY }}" ]]; then
-            echo "Secrets are not set. Exiting..."
-            echo "secrets_available=false" >> $GITHUB_OUTPUT
-          else
-            echo "Secrets are available."
-            echo "secrets_available=true" >> $GITHUB_OUTPUT
-          fi
-
   integration:
-    needs: access-secrets
-    if: needs.access-secrets.outputs.secrets_available == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -49,6 +29,7 @@ jobs:
       TORCH_URL: "https://download.pytorch.org/whl/cpu/torch_stable.html"
       DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
       UV_TORCH_BACKEND: "cpu"
+      LIGHTNING_CLOUD_URL: https://staging.gridai.dev
 
     steps:
       - uses: actions/checkout@v5

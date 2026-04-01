@@ -19,4 +19,4 @@ _SKIP_IF_PYTORCHLIGHTNING_BELLOW_2_5_1 = pytest.mark.skipif(
 )
 
 LIT_ORG = "lightning-ai"
-LIT_TEAMSPACE = "OSS | litModels"
+LIT_TEAMSPACE = "oss-litlogger"
