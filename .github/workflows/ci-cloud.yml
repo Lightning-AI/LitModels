@@ -32,7 +32,7 @@ jobs:
       LIGHTNING_CLOUD_URL: https://staging.gridai.dev
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install uv and set Python ${{ matrix.python-version }}
         uses: astral-sh/setup-uv@v7
@@ -67,7 +67,7 @@ jobs:
           coverage xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
