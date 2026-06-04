@@ -16,6 +16,8 @@ on: # Trigger the workflow on push or pull request, but only for the main branch
 jobs:
   build:
     runs-on: ubuntu-22.04
+    env:
+      UV_EXCLUDE_NEWER: "2 days"
 
     steps:
       - uses: actions/checkout@v6

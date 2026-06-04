@@ -30,6 +30,7 @@ jobs:
       DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
       UV_TORCH_BACKEND: "cpu"
       LIGHTNING_CLOUD_URL: https://staging.gridai.dev
+      UV_EXCLUDE_NEWER: "2 days"
 
     steps:
       - uses: actions/checkout@v5
