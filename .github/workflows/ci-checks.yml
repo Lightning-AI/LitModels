@@ -15,20 +15,20 @@ jobs:
   #  uses: Lightning-AI/utilities/.github/workflows/check-precommit.yml@main
 
   check-typing:
-    uses: Lightning-AI/utilities/.github/workflows/check-typing.yml@main
+    uses: Lightning-AI/utilities/.github/workflows/check-typing.yml@86fe1b20b4609835ba9e8c8739cd39707ba76868 # v0.15.3
     with:
-      actions-ref: main
+      actions-ref: 86fe1b20b4609835ba9e8c8739cd39707ba76868
       extra-typing: "typing"
 
   check-schema:
-    uses: Lightning-AI/utilities/.github/workflows/check-schema.yml@main
+    uses: Lightning-AI/utilities/.github/workflows/check-schema.yml@86fe1b20b4609835ba9e8c8739cd39707ba76868 # v0.15.3
     with:
       azure-dir: ""
 
   check-package:
-    uses: Lightning-AI/utilities/.github/workflows/check-package.yml@main
+    uses: Lightning-AI/utilities/.github/workflows/check-package.yml@86fe1b20b4609835ba9e8c8739cd39707ba76868 # v0.15.3
     with:
-      actions-ref: main
+      actions-ref: 86fe1b20b4609835ba9e8c8739cd39707ba76868
       import-name: "litmodels"
       artifact-name: dist-packages-${{ github.sha }}
       testing-matrix: |
