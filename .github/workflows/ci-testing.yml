@@ -63,6 +63,7 @@ jobs:
       TORCH_URL: "https://download.pytorch.org/whl/cpu/torch_stable.html"
       DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
       UV_TORCH_BACKEND: "cpu"
+      UV_EXCLUDE_NEWER: "2 days"
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
