@@ -41,7 +41,7 @@ Download = "https://github.com/Lightning-AI/litModels"
 
 [project.optional-dependencies]
 build = [
-    "build ==1.4.*",
+    "build >=1.4,<1.6",
     "twine ==6.2.*",
 ]
 docs = [
