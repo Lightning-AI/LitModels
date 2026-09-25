@@ -37,7 +37,14 @@ jobs:
           "python-version": ["3.10", "3.12"]
         }
 
-#  check-docs:
-#    uses: Lightning-AI/utilities/.github/workflows/check-docs.yml@main
-#    with:
-#      requirements-file: "_requirements/_docs.txt"
+  #  check-docs:
+  #    uses: Lightning-AI/utilities/.github/workflows/check-docs.yml@main
+  #    with:
+  #      requirements-file: "_requirements/_docs.txt"
+
+  check-md-links:
+    uses: deependujha/utilities/tree/patch-1/.github/workflows/check-md-links.yml
+    with:
+      config-file: ".github/markdown-links-config.json"
+      base-branch: "main"
+      force-check-all: "yes"
