@@ -31,7 +31,6 @@ def test_io_exports_are_reexported_from_litlogger():
 
 
 def test_cloud_exports_are_reexported_from_litlogger():
-    assert litmodels_cloud._list_available_teamspaces is litlogger_cloud._list_available_teamspaces
     assert litmodels_cloud.delete_model_version is litlogger_cloud.delete_model_version
     assert litmodels_cloud.download_model_files is litlogger_cloud.download_model_files
     assert litmodels_cloud.upload_model_files is litlogger_cloud.upload_model_files

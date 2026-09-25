@@ -18,10 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-22.04", "macOS-14", "windows-2022"]
-        python-version: ["3.10"]
+        python-version: ["3.11"]
         requires: ["latest"]
         include:
-          - { os: "ubuntu-22.04", python-version: "3.10", requires: "oldest" }
+          - { os: "ubuntu-22.04", python-version: "3.11", requires: "oldest" }
 
     # Timeout: https://stackoverflow.com/a/59076067/4521646
     timeout-minutes: 25

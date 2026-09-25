@@ -9,13 +9,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 from lightning_sdk.lightning_cloud.login import Auth
-from lightning_sdk.utils.resolve import _resolve_teamspace
 from lightning_utilities import StrEnum
 from lightning_utilities.core.rank_zero import rank_zero_debug, rank_zero_only, rank_zero_warn
 
 from litmodels import upload_model
 from litmodels.integrations.imports import _LIGHTNING_AVAILABLE, _PYTORCHLIGHTNING_AVAILABLE
-from litmodels.io.cloud import _list_available_teamspaces, delete_model_version
+from litmodels.io.cloud import delete_model_version
 
 if _LIGHTNING_AVAILABLE:
     from lightning.pytorch.callbacks import ModelCheckpoint as _LightningModelCheckpoint
@@ -243,19 +242,6 @@ class LitModelCheckpointMixin(ABC):
         elif count_slashes_in_name == 0:
             if not self.model_registry:
                 self.model_registry = default_model_name
-            teamspace = _resolve_teamspace(None, None, None)
-            if teamspace:
-                # case you use default model name and teamspace determined from env. variables aka running in studio
-                self.model_registry = f"{teamspace.owner.name}/{teamspace.name}/{self.model_registry}"
-            else:  # try to load default users teamspace
-                ts_names = list(_list_available_teamspaces().keys())
-                if len(ts_names) == 1:
-                    self.model_registry = f"{ts_names[0]}/{self.model_registry}"
-                else:
-                    options = "\n\t".join(ts_names)
-                    raise RuntimeError(
-                        f"Teamspace is not defined and there are multiple teamspaces available:\n{options}"
-                    )
         else:
             raise RuntimeError(f"Invalid model name: '{self.model_registry}'")
 

@@ -53,38 +53,12 @@ def test_lightning_checkpoint_callback(
     if model_name:
         ckpt_args.update({"model_registry": model_name})
 
-    all_model_registry = {
-        "org-name/teamspace/model-name": {"org": "org-name", "teamspace": "teamspace", "model": "model-name"},
-        "model-in-studio": {"org": "my-org", "teamspace": "dream-team", "model": "model-in-studio"},
-        "model-user-only-project": {"org": "my-org", "teamspace": "default-ts", "model": "model-user-only-project"},
-    }
     expected_boring_model = "BoringModel_20250102-1213"
-    expected_model_registry = all_model_registry.get(
-        model_name,
-        {"org": "org-name", "teamspace": "teamspace", "model": expected_boring_model},
-    )
-    expected_org = expected_model_registry["org"]
-    expected_teamspace = expected_model_registry["teamspace"]
-    expected_model = expected_model_registry["model"]
+    expected_model_registry = model_name or expected_boring_model
     monkeypatch.setattr(
         "litmodels.integrations.checkpoints.LitModelCheckpointMixin.default_model_name",
         mock.MagicMock(return_value=expected_boring_model),
     )
-    if model_name is None or model_name == "model-in-studio":
-        mock_teamspace = mock.Mock(owner=mock.Mock())
-        mock_teamspace.owner.name = expected_org
-        mock_teamspace.name = expected_teamspace
-
-        monkeypatch.setattr(
-            "litmodels.integrations.checkpoints._resolve_teamspace", mock.MagicMock(return_value=mock_teamspace)
-        )
-    elif model_name == "model-user-only-project":
-        monkeypatch.setattr("litmodels.integrations.checkpoints._resolve_teamspace", mock.MagicMock(return_value=None))
-        monkeypatch.setattr(
-            "litmodels.integrations.checkpoints._list_available_teamspaces",
-            mock.MagicMock(return_value={f"{expected_org}/{expected_teamspace}": {}}),
-        )
-
     # mocking the trainer delete checkpoint removal
     mock_remove_ckpt = mock.Mock()
     # setting the Trainer and custom checkpointing
@@ -98,7 +72,7 @@ def test_lightning_checkpoint_callback(
     assert mock_auth.call_count == 1
     assert mock_upload_model.call_args_list == [
         mock.call(
-            name=f"{expected_org}/{expected_teamspace}/{expected_model}:{v}",
+            name=f"{expected_model_registry}:{v}",
             model=mock.ANY,
             metadata={"litModels.integration": LitModelCheckpoint.__name__},
         )
@@ -111,7 +85,7 @@ def test_lightning_checkpoint_callback(
     assert mock_delete_model.call_count == expected_cloud_removals
     if expected_cloud_removals:
         mock_delete_model.assert_called_once_with(
-            name=f"{expected_org}/{expected_teamspace}/{expected_model}",
+            name=expected_model_registry,
             version="epoch=0-step=64",
         )
 

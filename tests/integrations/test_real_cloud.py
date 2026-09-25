@@ -13,7 +13,6 @@ from lightning_sdk.utils.resolve import _get_authed_user, _resolve_teamspace
 from litmodels import download_model, load_model, save_model, upload_model
 from litmodels.integrations.duplicate import duplicate_hf_model
 from litmodels.integrations.mixins import PickleRegistryMixin, PyTorchRegistryMixin
-from litmodels.io.cloud import _list_available_teamspaces
 from litmodels.io.utils import _KERAS_AVAILABLE
 from tests.integrations import (
     _SKIP_IF_LIGHTNING_BELLOW_2_5_1,
@@ -321,13 +320,6 @@ def test_duplicate_real_hf_model(tmp_path):
         model_name=model_name,
     )
     client.models_store_delete_model(project_id=teamspace.id, model_id=model.id)
-
-
-@pytest.mark.cloud
-def test_list_available_teamspaces():
-    teams = _list_available_teamspaces()
-    assert len(teams) > 0
-    assert f"{LIT_USER}/{LIT_TEAMSPACE}" in teams
 
 
 @pytest.mark.cloud
