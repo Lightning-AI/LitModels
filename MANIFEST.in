@@ -26,9 +26,6 @@ exclude tests
 recursive-exclude docs *
 exclude docs
 
-# Include the Requirements
-include requirements.txt
-
 # Exclude Makefile
 exclude Makefile
 

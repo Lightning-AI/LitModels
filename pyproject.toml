@@ -1,6 +1,7 @@
 [build-system]
 requires = [
-    "setuptools>=69",
+    "setuptools>=80",
+    "setuptools-scm[simple]>=9.2",
     "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -30,7 +31,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dynamic = ["version", "dependencies"]
+dynamic = ["version"]
+dependencies = [
+    "litlogger >=2026.04.16post0",
+    "lightning-sdk >=2026.04.16",
+    "lightning-utilities <=0.15.3",
+]
 
 [project.urls]
 "Bug Tracker" = "https://github.com/Lightning-AI/litModels/issues"
@@ -85,11 +91,6 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.dynamic]
-version = { attr = "litmodels.__about__.__version__" }
-dependencies = { file = ["requirements.txt"] }
-
 
 [tool.check-manifest]
 ignore = [

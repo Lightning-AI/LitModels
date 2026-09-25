@@ -1,3 +1,0 @@
-litlogger >=2026.04.16post0
-lightning-sdk >=2026.04.16
-lightning-utilities<=0.15.3
