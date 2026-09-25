@@ -111,3 +111,5 @@ lightning_logs
 
 # Ruff
 .ruff_cache/
+
+uv.lock

@@ -1,4 +1,4 @@
-"""Compatibility exports for the vendored litlogger model helpers."""
+"""Compatibility exports for LitLogger's model serialization helpers."""
 
 from litlogger.models.serialization import (
     _JOBLIB_AVAILABLE,

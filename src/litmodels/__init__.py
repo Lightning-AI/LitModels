@@ -2,7 +2,7 @@
 
 import os
 
-from litlogger.models import download_model, load_model, save_model, upload_model, upload_model_files
+from litlogger.models import download_model, load_model, save_model, upload_model, upload_model_files  # noqa: F401
 
 from litmodels.__about__ import *  # noqa: F401, F403
 

@@ -5,6 +5,7 @@ recursive-exclude __pycache__  *.py[cod] *.orig
 
 # Include the README and CHANGELOG
 include *.md
+include pyproject.toml
 recursive-include src *.md
 
 # Include the license file
@@ -12,7 +13,6 @@ include LICENSE
 
 # Exclude build configs
 exclude *.sh
-exclude *.toml
 exclude *.svg
 exclude *.yml
 exclude *.yaml
@@ -28,7 +28,6 @@ exclude docs
 
 # Include the Requirements
 include requirements.txt
-recursive-include _requirements *.tx;t
 
 # Exclude Makefile
 exclude Makefile

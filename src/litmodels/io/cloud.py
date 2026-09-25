@@ -1,4 +1,4 @@
-"""Compatibility exports for the vendored litlogger model helpers."""
+"""Compatibility exports for LitLogger's cloud model helpers."""
 
 from litlogger.models.cloud import (
     _list_available_teamspaces,

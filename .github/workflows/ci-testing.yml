@@ -26,11 +26,36 @@ jobs:
         python-version: ["3.10", "3.12"]
         requires: ["latest"]
         dependency: ["lightning"]
+        dependency_package: ["lightning"]
         include:
-          - { os: "ubuntu-22.04", python-version: "3.10", requires: "oldest", dependency: "lightning" }
-          - { os: "ubuntu-24.04", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
-          - { os: "windows-2022", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
-          - { os: "macOS-14", python-version: "3.12", requires: "latest", dependency: "pytorch_lightning" }
+          - {
+              os: "ubuntu-22.04",
+              python-version: "3.10",
+              requires: "oldest",
+              dependency: "lightning",
+              dependency_package: "lightning",
+            }
+          - {
+              os: "ubuntu-24.04",
+              python-version: "3.12",
+              requires: "latest",
+              dependency: "pytorch_lightning",
+              dependency_package: "pytorch-lightning",
+            }
+          - {
+              os: "windows-2022",
+              python-version: "3.12",
+              requires: "latest",
+              dependency: "pytorch_lightning",
+              dependency_package: "pytorch-lightning",
+            }
+          - {
+              os: "macOS-14",
+              python-version: "3.12",
+              requires: "latest",
+              dependency: "pytorch_lightning",
+              dependency_package: "pytorch-lightning",
+            }
 
     # Timeout: https://stackoverflow.com/a/59076067/4521646
     timeout-minutes: 35
@@ -38,12 +63,13 @@ jobs:
       TORCH_URL: "https://download.pytorch.org/whl/cpu/torch_stable.html"
       DISABLE_MPS: ${{ matrix.os == 'macOS-14' && '1' || '0' }}
       UV_TORCH_BACKEND: "cpu"
+      UV_EXCLUDE_NEWER: "2 days"
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install uv and set Python ${{ matrix.python-version }}
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           python-version: ${{ matrix.python-version }}
           activate-environment: true
@@ -53,16 +79,15 @@ jobs:
         if: matrix.requires == 'oldest'
         run: |
           uv pip install 'lightning-utilities[cli]'
-          python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt"]'
+          python -m lightning_utilities.cli requirements set-oldest --req_files='["requirements.txt", "pyproject.toml"]'
 
       - name: Adjust requirements
         run: |
           uv pip install 'lightning-utilities[cli]' -q
           python -m lightning_utilities.cli requirements replace-pkg \
             --old_package="lightning" \
-            --new_package="${{matrix.dependency}}" \
-            --req_files='["_requirements/extra.txt"]'
-          cat _requirements/extra.txt
+            --new_package="${{ matrix.dependency_package }}" \
+            --req_files='["pyproject.toml"]'
 
       - name: Install package & dependencies
         run: |
@@ -83,7 +108,7 @@ jobs:
           coverage xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
