@@ -69,7 +69,6 @@ def save_model(
     """Serialize an in-memory model and upload it to Lightning Cloud Models.
 
     Supported models:
-        - TorchScript (torch.jit.ScriptModule) → saved as .ts via model.save()
         - PyTorch nn.Module → saved as .pth (state_dict via torch.save)
         - Keras (tf.keras.Model) → saved as .keras via model.save()
         - Any other Python object → saved as .pkl via pickle or joblib
@@ -101,10 +100,7 @@ def save_model(
     # if LightningModule and isinstance(model, LightningModule):
     #     path = os.path.join(staging_dir, f"{model.__class__.__name__}.ckpt")
     #     model.save_checkpoint(path)
-    if _PYTORCH_AVAILABLE and isinstance(model, torch.jit.ScriptModule):
-        path = os.path.join(staging_dir, f"{model.__class__.__name__}.ts")
-        model.save(path)
-    elif _PYTORCH_AVAILABLE and isinstance(model, torch.nn.Module):
+    if _PYTORCH_AVAILABLE and isinstance(model, torch.nn.Module):
         path = os.path.join(staging_dir, f"{model.__class__.__name__}.pth")
         torch.save(model.state_dict(), path)
     elif _KERAS_AVAILABLE and isinstance(model, keras.models.Model):
@@ -154,7 +150,6 @@ def load_model(name: str, download_dir: str = ".") -> Any:
     """Download a model and load it into memory based on its file extension.
 
     Supported formats:
-        - .ts → torch.jit.load
         - .keras → keras.models.load_model
         - .pkl → pickle/joblib via load_pickle
 
@@ -174,8 +169,6 @@ def load_model(name: str, download_dir: str = ".") -> Any:
     if len(download_paths) > 1:
         raise NotImplementedError("Downloaded model with multiple files is not supported yet.")
     model_path = Path(download_dir) / download_paths[0]
-    if model_path.suffix.lower() == ".ts":
-        return torch.jit.load(model_path)
     if model_path.suffix.lower() == ".keras":
         return keras.models.load_model(model_path)
     if model_path.suffix.lower() == ".pkl":

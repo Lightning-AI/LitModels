@@ -15,4 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Dropped TorchScript (`torch.jit.ScriptModule`) support in `save_model` / `load_model` as `torch.jit.script` is deprecated in PyTorch
+
 ### Deprecated
