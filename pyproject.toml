@@ -61,7 +61,7 @@ docs = [
 ]
 extra = [
     "lightning >= 2.0.0",
-    "numpy <2.0.0 ; platform_system == 'Darwin'",
+    "numpy <3.0.0 ; platform_system == 'Darwin'",
     "joblib >= 1.0.0",
 ]
 test = [
