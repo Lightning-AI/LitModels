@@ -9,6 +9,7 @@ import inspect
 import os
 import re
 import sys
+from importlib.metadata import requires
 from importlib.util import module_from_spec, spec_from_file_location
 
 import pt_lightning_sphinx_theme
@@ -288,13 +289,13 @@ def setup(app):
 
 # Ignoring Third-party packages
 # https://stackoverflow.com/questions/15889621/sphinx-how-to-exclude-imports-in-automodule
-def _package_list_from_file(file):
+def _package_list_from_metadata(package):
     list_pkgs = []
-    with open(file) as fp:
-        lines = fp.readlines()
-    for ln in lines:
-        found = [ln.index(ch) for ch in list(",=<>#") if ch in ln]
-        pkg = ln[: min(found)] if found else ln
+    for requirement in requires(package) or []:
+        if "extra ==" in requirement:
+            continue
+        found = [requirement.index(ch) for ch in list(",=<>!~;[") if ch in requirement]
+        pkg = requirement[: min(found)] if found else requirement
         if pkg.rstrip():
             list_pkgs.append(pkg.rstrip())
     return list_pkgs
@@ -303,13 +304,13 @@ def _package_list_from_file(file):
 # define mapping from PyPI names to python imports
 PACKAGE_MAPPING = {
     "PyYAML": "yaml",
+    "lightning-sdk": "lightning_sdk",
+    "lightning-utilities": "lightning_utilities",
 }
 MOCK_PACKAGES = []
 if SPHINX_MOCK_REQUIREMENTS:
     # mock also base packages when we are on RTD since we don't install them there
-    MOCK_PACKAGES += _package_list_from_file(
-        os.path.join(_PATH_ROOT, "requirements.txt")
-    )
+    MOCK_PACKAGES += _package_list_from_metadata("litmodels")
 MOCK_PACKAGES = [PACKAGE_MAPPING.get(pkg, pkg) for pkg in MOCK_PACKAGES]
 
 autodoc_mock_imports = MOCK_PACKAGES

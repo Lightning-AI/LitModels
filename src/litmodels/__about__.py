@@ -1,4 +1,6 @@
-__version__ = "0.1.8"
+from importlib.metadata import version
+
+__version__ = version("litmodels")
 __author__ = "Lightning-AI et al."
 __author_email__ = "community@lightning.ai"
 __license__ = "Apache-2.0"
