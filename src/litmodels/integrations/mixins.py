@@ -4,7 +4,7 @@ import tempfile
 import warnings
 from abc import ABC
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from lightning_utilities.core.rank_zero import rank_zero_warn
 
@@ -19,7 +19,7 @@ class ModelRegistryMixin(ABC):
     """Mixin for model registry integration."""
 
     def upload_model(
-        self, name: Optional[str] = None, version: Optional[str] = None, temp_folder: Union[str, Path, None] = None
+        self, name: str | None = None, version: str | None = None, temp_folder: str | Path | None = None
     ) -> None:
         """Push the model to the registry.
 
@@ -30,9 +30,7 @@ class ModelRegistryMixin(ABC):
         """
 
     @classmethod
-    def download_model(
-        cls, name: str, version: Optional[str] = None, temp_folder: Union[str, Path, None] = None
-    ) -> object:
+    def download_model(cls, name: str, version: str | None = None, temp_folder: str | Path | None = None) -> object:
         """Pull the model from the registry.
 
         Args:
@@ -41,9 +39,7 @@ class ModelRegistryMixin(ABC):
             temp_folder: The temporary folder to save the model. If None, a default temporary folder is used.
         """
 
-    def _setup(
-        self, name: Optional[str] = None, temp_folder: Union[str, Path, None] = None
-    ) -> tuple[str, str, Union[str, Path]]:
+    def _setup(self, name: str | None = None, temp_folder: str | Path | None = None) -> tuple[str, str, str | Path]:
         """Parse and validate the model name and temporary folder."""
         if name is None:
             name = model_name = self.__class__.__name__
@@ -55,9 +51,7 @@ class ModelRegistryMixin(ABC):
             temp_folder = tempfile.mkdtemp()
         return name, model_name, temp_folder
 
-    def _upload_model_files(
-        self, name: str, path: Union[str, Path, list[Union[str, Path]]], metadata: Optional[dict] = None
-    ) -> None:
+    def _upload_model_files(self, name: str, path: str | Path | list[str | Path], metadata: dict | None = None) -> None:
         """Upload the model files to the registry."""
         if not metadata:
             metadata = {}
@@ -74,10 +68,10 @@ class PickleRegistryMixin(ModelRegistryMixin):
 
     def upload_model(
         self,
-        name: Optional[str] = None,
-        version: Optional[str] = None,
-        temp_folder: Union[str, Path, None] = None,
-        metadata: Optional[dict] = None,
+        name: str | None = None,
+        version: str | None = None,
+        temp_folder: str | Path | None = None,
+        metadata: dict | None = None,
     ) -> None:
         """Push the model to the registry.
 
@@ -95,9 +89,7 @@ class PickleRegistryMixin(ModelRegistryMixin):
         self._upload_model_files(name=name, path=pickle_path, metadata=metadata)
 
     @classmethod
-    def download_model(
-        cls, name: str, version: Optional[str] = None, temp_folder: Union[str, Path, None] = None
-    ) -> object:
+    def download_model(cls, name: str, version: str | None = None, temp_folder: str | Path | None = None) -> object:
         """Pull the model from the registry.
 
         Args:
@@ -145,10 +137,10 @@ class PyTorchRegistryMixin(ModelRegistryMixin):
 
     def upload_model(
         self,
-        name: Optional[str] = None,
-        version: Optional[str] = None,
-        temp_folder: Union[str, Path, None] = None,
-        metadata: Optional[dict] = None,
+        name: str | None = None,
+        version: str | None = None,
+        temp_folder: str | Path | None = None,
+        metadata: dict | None = None,
     ) -> None:
         """Push the model to the registry.
 
@@ -199,9 +191,9 @@ class PyTorchRegistryMixin(ModelRegistryMixin):
     def download_model(
         cls,
         name: str,
-        version: Optional[str] = None,
-        temp_folder: Union[str, Path, None] = None,
-        torch_load_kwargs: Optional[dict] = None,
+        version: str | None = None,
+        temp_folder: str | Path | None = None,
+        torch_load_kwargs: dict | None = None,
     ) -> "torch.nn.Module":
         """Pull the model from the registry.
 

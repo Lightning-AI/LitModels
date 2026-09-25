@@ -3,7 +3,7 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from lightning_sdk.lightning_cloud.env import LIGHTNING_CLOUD_URL
 from lightning_sdk.models import _extend_model_name_with_teamspace, _parse_org_teamspace_model_version
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 _SHOWED_MODEL_LINKS = []
 
 
-def _print_model_link(name: str, verbose: Union[bool, int]) -> None:
+def _print_model_link(name: str, verbose: bool | int) -> None:
     """Print a stable URL to the uploaded model.
 
     Args:
@@ -44,11 +44,11 @@ def _print_model_link(name: str, verbose: Union[bool, int]) -> None:
 
 def upload_model_files(
     name: str,
-    path: Union[str, Path, list[Union[str, Path]]],
+    path: str | Path | list[str | Path],
     progress_bar: bool = True,
-    cloud_account: Optional[str] = None,
-    verbose: Union[bool, int] = 1,
-    metadata: Optional[dict[str, str]] = None,
+    cloud_account: str | None = None,
+    verbose: bool | int = 1,
+    metadata: dict[str, str] | None = None,
 ) -> "UploadedModelInfo":
     """Upload local artifact(s) to Lightning Cloud using the SDK.
 
@@ -83,9 +83,9 @@ def upload_model_files(
 
 def download_model_files(
     name: str,
-    download_dir: Union[str, Path] = ".",
+    download_dir: str | Path = ".",
     progress_bar: bool = True,
-) -> Union[str, list[str]]:
+) -> str | list[str]:
     """Download artifact(s) for a model version using the SDK.
 
     Args:

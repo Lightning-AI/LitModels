@@ -3,7 +3,7 @@ import pickle
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 from lightning_utilities import module_available
 from lightning_utilities.core.imports import RequirementCache
@@ -32,7 +32,7 @@ if _JOBLIB_AVAILABLE:
     import joblib
 
 
-def dump_pickle(model: Any, path: Union[str, Path]) -> None:
+def dump_pickle(model: Any, path: str | Path) -> None:
     """Serialize a Python object to disk using joblib (if available) or pickle.
 
     Args:
@@ -50,7 +50,7 @@ def dump_pickle(model: Any, path: Union[str, Path]) -> None:
             pickle.dump(model, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_pickle(path: Union[str, Path]) -> Any:
+def load_pickle(path: str | Path) -> Any:
     """Load a Python object from a joblib/pickle file.
 
     Args:

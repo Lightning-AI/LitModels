@@ -2,7 +2,6 @@ import os
 import platform
 from contextlib import redirect_stdout
 from io import StringIO
-from typing import Optional
 
 import pytest
 import torch
@@ -37,7 +36,7 @@ def _mock_studio_env(monkeypatch) -> None:
     monkeypatch.setenv("LIGHTNING_USERNAME", _get_authed_user().name)
 
 
-def _cleanup_model(teamspace: Teamspace, model_name: str, expected_num_versions: Optional[int] = None) -> None:
+def _cleanup_model(teamspace: Teamspace, model_name: str, expected_num_versions: int | None = None) -> None:
     """Cleanup model from the teamspace."""
     client = GridRestClient()
     # cleaning created models as each test run shall have unique model name

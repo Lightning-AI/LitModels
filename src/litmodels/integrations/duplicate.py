@@ -2,7 +2,6 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 from lightning_utilities import module_available
 
@@ -16,10 +15,10 @@ else:
 
 def duplicate_hf_model(
     hf_model: str,
-    lit_model: Optional[str] = None,
-    local_workdir: Optional[str] = None,
+    lit_model: str | None = None,
+    local_workdir: str | None = None,
     verbose: int = 1,
-    metadata: Optional[dict] = None,
+    metadata: dict | None = None,
 ) -> str:
     """Download a model from Hugging Face and upload it to Lightning Cloud as a new model.
 

@@ -6,7 +6,7 @@ from abc import ABC
 from datetime import datetime
 from functools import cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional
 
 from lightning_sdk.lightning_cloud.login import Auth
 from lightning_sdk.utils.resolve import _resolve_teamspace
@@ -127,14 +127,14 @@ class ModelManager:
                 rank_zero_warn(f"Unknown task: {task}")
             self.task_queue.task_done()
 
-    def queue_upload(self, registry_name: str, filepath: Union[str, Path], metadata: Optional[dict] = None) -> None:
+    def queue_upload(self, registry_name: str, filepath: str | Path, metadata: dict | None = None) -> None:
         """Queue an upload task."""
         self.upload_count += 1
         self.task_queue.put((Action.UPLOAD, (registry_name, filepath, metadata)))
         rank_zero_debug(f"Queued upload: {filepath} (pending uploads: {self.upload_count})")
 
     def queue_remove(
-        self, filepath: Union[str, Path], trainer: Optional["pl.Trainer"] = None, registry_name: Optional[str] = None
+        self, filepath: str | Path, trainer: Optional["pl.Trainer"] = None, registry_name: str | None = None
     ) -> None:
         """Queue a removal task."""
         self.remove_count += 1
@@ -157,11 +157,11 @@ class LitModelCheckpointMixin(ABC):
     """
 
     _datetime_stamp: str
-    model_registry: Optional[str] = None
+    model_registry: str | None = None
     _model_manager: ModelManager
 
     def __init__(
-        self, model_registry: Optional[str], keep_all_uploaded: bool = False, clear_all_local: bool = False
+        self, model_registry: str | None, keep_all_uploaded: bool = False, clear_all_local: bool = False
     ) -> None:
         """Configure model registry and pruning behavior.
 
@@ -188,7 +188,7 @@ class LitModelCheckpointMixin(ABC):
         self._model_manager = ModelManager()
 
     @rank_zero_only
-    def _upload_model(self, trainer: "pl.Trainer", filepath: Union[str, Path], metadata: Optional[dict] = None) -> None:
+    def _upload_model(self, trainer: "pl.Trainer", filepath: str | Path, metadata: dict | None = None) -> None:
         if not self.model_registry:
             raise RuntimeError(
                 "Model name is not specified neither updated by `setup` method via Trainer."
@@ -212,7 +212,7 @@ class LitModelCheckpointMixin(ABC):
             get_model_manager().queue_remove(filepath=filepath, trainer=trainer)
 
     @rank_zero_only
-    def _remove_model(self, trainer: "pl.Trainer", filepath: Union[str, Path]) -> None:
+    def _remove_model(self, trainer: "pl.Trainer", filepath: str | Path) -> None:
         """Queue removal of local and/or cloud artifacts according to configuration."""
         get_model_manager().queue_remove(
             filepath=filepath,
@@ -277,8 +277,8 @@ if _LIGHTNING_AVAILABLE:
         def __init__(
             self,
             *args: Any,
-            model_name: Optional[str] = None,
-            model_registry: Optional[str] = None,
+            model_name: str | None = None,
+            model_registry: str | None = None,
             keep_all_uploaded: bool = False,
             clear_all_local: bool = False,
             **kwargs: Any,
@@ -336,8 +336,8 @@ if _PYTORCHLIGHTNING_AVAILABLE:
         def __init__(
             self,
             *args: Any,
-            model_name: Optional[str] = None,
-            model_registry: Optional[str] = None,
+            model_name: str | None = None,
+            model_registry: str | None = None,
             keep_all_uploaded: bool = False,
             clear_all_local: bool = False,
             **kwargs: Any,

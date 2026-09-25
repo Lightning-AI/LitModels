@@ -1,7 +1,7 @@
 import os
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from litmodels.io.cloud import download_model_files, upload_model_files
 from litmodels.io.utils import _KERAS_AVAILABLE, _PYTORCH_AVAILABLE, dump_pickle, load_pickle
@@ -18,11 +18,11 @@ if TYPE_CHECKING:
 
 def upload_model(
     name: str,
-    model: Union[str, Path],
+    model: str | Path,
     progress_bar: bool = True,
-    cloud_account: Optional[str] = None,
-    verbose: Union[bool, int] = 1,
-    metadata: Optional[dict[str, str]] = None,
+    cloud_account: str | None = None,
+    verbose: bool | int = 1,
+    metadata: dict[str, str] | None = None,
 ) -> "UploadedModelInfo":
     """Upload a local artifact (file or directory) to Lightning Cloud Models.
 
@@ -61,10 +61,10 @@ def save_model(
     name: str,
     model: Union["torch.nn.Module", Any],
     progress_bar: bool = True,
-    cloud_account: Optional[str] = None,
-    staging_dir: Optional[str] = None,
-    verbose: Union[bool, int] = 1,
-    metadata: Optional[dict[str, str]] = None,
+    cloud_account: str | None = None,
+    staging_dir: str | None = None,
+    verbose: bool | int = 1,
+    metadata: dict[str, str] | None = None,
 ) -> "UploadedModelInfo":
     """Serialize an in-memory model and upload it to Lightning Cloud Models.
 
@@ -130,9 +130,9 @@ def save_model(
 
 def download_model(
     name: str,
-    download_dir: Union[str, Path] = ".",
+    download_dir: str | Path = ".",
     progress_bar: bool = True,
-) -> Union[str, list[str]]:
+) -> str | list[str]:
     """Download a model version from Lightning Cloud Models to a local directory.
 
     Args:
