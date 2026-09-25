@@ -150,6 +150,7 @@ def load_model(name: str, download_dir: str = ".") -> Any:
     """Download a model and load it into memory based on its file extension.
 
     Supported formats:
+        - .pth → torch.load
         - .keras → keras.models.load_model
         - .pkl → pickle/joblib via load_pickle
 
@@ -173,4 +174,6 @@ def load_model(name: str, download_dir: str = ".") -> Any:
         return keras.models.load_model(model_path)
     if model_path.suffix.lower() == ".pkl":
         return load_pickle(path=model_path)
+    if model_path.suffix.lower() == ".pth":
+        return torch.load(model_path, weights_only=False)
     raise NotImplementedError(f"Loading model from {model_path.suffix} is not supported yet.")
