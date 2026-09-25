@@ -116,16 +116,32 @@ def _list_available_teamspaces() -> dict[str, dict]:
     from lightning_sdk.utils import resolve as sdk_resolvers
 
     org_api = OrgApi()
+    user_api = UserApi()
     user = sdk_resolvers._get_authed_user()
+
     teamspaces = {}
-    for ts in UserApi()._get_all_teamspace_memberships(""):
+    seen_project_ids = set()
+
+    for ts in user_api._get_all_teamspace_memberships(""):
+        if ts.project_id in seen_project_ids:
+            continue
+
+        seen_project_ids.add(ts.project_id)
+
         if ts.owner_type == "organization":
             org = org_api._get_org_by_id(ts.owner_id)
-            teamspaces[f"{org.name}/{ts.name}"] = {"name": ts.name, "org": org.name}
-        elif ts.owner_type == "user":  # todo: check also the name
-            teamspaces[f"{user.name}/{ts.name}"] = {"name": ts.name, "user": user}
+            teamspaces[f"{org.name}/{ts.name}"] = {
+                "name": ts.name,
+                "org": org.name,
+            }
+        elif ts.owner_type == "user":
+            teamspaces[f"{user.name}/{ts.name}"] = {
+                "name": ts.name,
+                "user": user,
+            }
         else:
-            raise RuntimeError(f"Unknown organization type {ts.organization_type}")
+            raise RuntimeError(f"Unknown owner type: {ts.owner_type}")
+
     return teamspaces
 
 
