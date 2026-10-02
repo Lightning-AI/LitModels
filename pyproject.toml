@@ -75,7 +75,7 @@ test = [
     "tensorflow >=2.0",
 ]
 typing = [
-    "mypy ==1.19.1",
+    "mypy ==2.1.0",
 ]
 
 [tool.setuptools]
