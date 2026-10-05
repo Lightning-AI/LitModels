@@ -138,12 +138,10 @@ from tensorflow import keras
 from litmodels import save_model
 
 # Define the model
-model = keras.Sequential(
-    [
-        keras.layers.Dense(10, input_shape=(784,), name="dense_1"),
-        keras.layers.Dense(10, name="dense_2"),
-    ]
-)
+model = keras.Sequential([
+    keras.layers.Dense(10, input_shape=(784,), name="dense_1"),
+    keras.layers.Dense(10, name="dense_2"),
+])
 
 # Compile the model
 model.compile(optimizer="adam", loss="categorical_crossentropy")
@@ -157,9 +155,7 @@ Load model:
 ```python
 from litmodels import load_model
 
-model_ = load_model(
-    "lightning-ai/jirka/sample-tf-keras-model", download_dir="./my-model"
-)
+model_ = load_model("lightning-ai/jirka/sample-tf-keras-model", download_dir="./my-model")
 ```
 
 </details>
@@ -178,9 +174,7 @@ iris = datasets.load_iris()
 X, y = iris.data, iris.target
 
 # Split dataset into training and test sets
-X_train, X_test, y_train, y_test = model_selection.train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Train a simple SVC model
 model = svm.SVC()
@@ -196,9 +190,7 @@ Use model:
 from litmodels import load_model
 
 # Download and load the model file from cloud storage
-model = load_model(
-    name="your_org/your_team/sklearn-svm-model", download_dir="my_models"
-)
+model = load_model(name="your_org/your_team/sklearn-svm-model", download_dir="my_models")
 
 # Example: run inference with the loaded model
 sample_input = [[5.1, 3.5, 1.4, 0.2]]
