@@ -32,7 +32,7 @@ Save, load, host, and share models without slowing down training.
     <a target="_blank" href="#features" style="margin: 0 10px;">Features</a> •
     <a target="_blank" href="#performance" style="margin: 0 10px;">Performance</a> •
     <a target="_blank" href="#community" style="margin: 0 10px;">Community</a> •
-    <a target="_blank" href="https://lightning.ai/docs/overview/model-registry" style="margin: 0 10px;">Docs</a>
+    <a target="_blank" href="https://lightning.ai/docs/platform/inference/custom-models/model-registry" style="margin: 0 10px;">Docs</a>
 </div>
 
 </div>
