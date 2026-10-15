@@ -1,6 +1,6 @@
 import os
 import pickle
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -10,7 +10,7 @@ from lightning_utilities.core.imports import RequirementCache
 
 
 @contextmanager
-def _suppress_os_stderr() -> Iterator[None]:
+def _suppress_os_stderr() -> Generator[None, None, None]:
     devnull_fd = os.open(os.devnull, os.O_WRONLY)
     old_stderr_fd = os.dup(2)
     os.dup2(devnull_fd, 2)  # redirect stderr (fd 2) to /dev/null
